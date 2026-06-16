@@ -20,14 +20,20 @@ Retorne SOMENTE um JSON válido, sem texto adicional, neste formato exato:
   "tts_text": "mesmo texto do script_short, limpo para narração",
   "srt": "1\\n00:00:00,000 --> 00:00:03,000\\nFrase de gancho\\n\\n2\\n00:00:03,000 --> 00:00:20,000\\nFrases de benefícios\\n\\n3\\n00:00:20,000 --> 00:00:30,000\\nFrase de CTA",
   "video_prompts": [
-    "close-up of {topic} on a desk, dramatic studio lighting, cinematic 4K, 0-10s hook scene",
-    "{topic} in action being used, hands interacting, clean background, product showcase shot",
-    "person smiling holding {topic}, thumbs up, bright lighting, call to action scene"
+    "close-up of {topic} on a desk, dramatic studio lighting, cinematic 4K, hook scene",
+    "{topic} in action being used, hands interacting, clean background, product showcase",
+    "person smiling holding {topic}, bright lighting, thumbs up, call to action scene"
   ],
   "thumbnail_prompt": "texto grande em destaque + imagem do produto {topic} em fundo escuro",
   "image_queries": ["{topic} product photo", "{topic} review setup"],
   "music_style": "eletrônica leve 100–110 BPM sem vocal"
 }}"""
+
+_REQUIRED_FIELDS = [
+    "script_short", "tts_text", "srt",
+    "thumbnail_prompt", "image_queries", "music_style", "video_prompts",
+]
+_LIST_FIELDS = {"image_queries", "video_prompts"}
 
 
 def _extract_json(text):
@@ -44,21 +50,57 @@ def _extract_json(text):
     return None
 
 
-def generate_script(topic, keywords, ollama_base_url, model):
-    """
-    Gera roteiro via Ollama local.
-    Retorna dict com campos do roteiro ou None em caso de falha.
-    """
-    logger.info(f"Gerando roteiro para: {topic}")
+def _validate_fields(data, topic):
+    for field in _REQUIRED_FIELDS:
+        if field not in data:
+            logger.warning(f"Campo ausente na resposta do LLM: {field}")
+            data[field] = [] if field in _LIST_FIELDS else ""
+    return data
 
-    prompt = _PROMPT_TEMPLATE.format(
-        topic=topic,
-        keywords=", ".join(keywords),
-    )
+
+def _generate_groq(topic, keywords, api_key, model):
+    """Gera roteiro via Groq API (Llama 3.3 70B na nuvem, grátis)."""
+    try:
+        from groq import Groq
+    except ImportError:
+        logger.error("groq não instalado. Execute: pip install groq")
+        return None
+
+    if not api_key:
+        logger.error("GROQ_API_KEY não configurado. Cadastre-se em console.groq.com")
+        return None
+
+    prompt = _PROMPT_TEMPLATE.format(topic=topic, keywords=", ".join(keywords))
+
+    try:
+        client = Groq(api_key=api_key)
+        completion = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7,
+            max_tokens=1024,
+        )
+        raw = completion.choices[0].message.content
+        data = _extract_json(raw)
+
+        if not data:
+            logger.error(f"Groq não retornou JSON válido para '{topic}'")
+            return None
+
+        return _validate_fields(data, topic)
+
+    except Exception as e:
+        logger.error(f"Erro ao chamar Groq API: {e}")
+        return None
+
+
+def _generate_ollama(topic, keywords, base_url, model):
+    """Gera roteiro via Ollama local."""
+    prompt = _PROMPT_TEMPLATE.format(topic=topic, keywords=", ".join(keywords))
 
     try:
         response = requests.post(
-            f"{ollama_base_url}/api/generate",
+            f"{base_url}/api/generate",
             json={
                 "model": model,
                 "prompt": prompt,
@@ -73,20 +115,10 @@ def generate_script(topic, keywords, ollama_base_url, model):
         data = _extract_json(raw)
 
         if not data:
-            logger.error(f"LLM não retornou JSON válido para '{topic}'")
+            logger.error(f"Ollama não retornou JSON válido para '{topic}'")
             return None
 
-        required_fields = [
-            "script_short", "tts_text", "srt",
-            "thumbnail_prompt", "image_queries", "music_style", "video_prompts",
-        ]
-        list_fields = {"image_queries", "video_prompts"}
-        for field in required_fields:
-            if field not in data:
-                logger.warning(f"Campo ausente na resposta do LLM: {field}")
-                data[field] = [] if field in list_fields else ""
-
-        return data
+        return _validate_fields(data, topic)
 
     except requests.exceptions.ConnectionError:
         logger.error("Ollama não está rodando. Execute: ollama serve")
@@ -97,3 +129,18 @@ def generate_script(topic, keywords, ollama_base_url, model):
     except Exception as e:
         logger.error(f"Erro inesperado ao gerar roteiro: {e}")
         return None
+
+
+def generate_script(topic, keywords, provider="ollama",
+                    groq_api_key=None, groq_model=None,
+                    ollama_base_url=None, ollama_model=None):
+    """
+    Gera roteiro via Groq (nuvem, recomendado) ou Ollama (local).
+    Controlado por LLM_PROVIDER no .env.
+    """
+    logger.info(f"Gerando roteiro [{provider.upper()}]: {topic}")
+
+    if provider == "groq":
+        return _generate_groq(topic, keywords, groq_api_key, groq_model)
+    else:
+        return _generate_ollama(topic, keywords, ollama_base_url, ollama_model)

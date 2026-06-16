@@ -3,9 +3,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Ollama (LLM local)
+# LLM — provider: "groq" (recomendado, grátis) ou "ollama" (local)
+LLM_PROVIDER    = os.getenv("LLM_PROVIDER", "ollama")
+GROQ_API_KEY    = os.getenv("GROQ_API_KEY", "")
+GROQ_MODEL      = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+
+# Ollama (LLM local — usado se LLM_PROVIDER=ollama)
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODEL    = os.getenv("OLLAMA_MODEL", "llama3.1")
+
+# YouTube auto-upload
+YOUTUBE_AUTO_UPLOAD      = os.getenv("YOUTUBE_AUTO_UPLOAD", "false").lower() == "true"
+YOUTUBE_CREDENTIALS_FILE = os.getenv("YOUTUBE_CREDENTIALS_FILE", "client_secrets.json")
+YOUTUBE_TOKEN_FILE       = os.getenv("YOUTUBE_TOKEN_FILE", "token.json")
+YOUTUBE_PRIVACY          = os.getenv("YOUTUBE_PRIVACY", "private")
 
 # Unsplash (imagens royalty-free)
 UNSPLASH_ACCESS_KEY = os.getenv("UNSPLASH_ACCESS_KEY", "")
@@ -32,9 +43,12 @@ TTS_RATE  = "+10%"
 VIDEO_WIDTH        = 1080
 VIDEO_HEIGHT       = 1920
 VIDEO_MAX_DURATION = 30
+# Encoder: "auto" detecta automaticamente (AMD AMF > NVENC > CPU)
+VIDEO_ENCODER      = os.getenv("VIDEO_ENCODER", "auto")
 
 # Paths
 BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR     = os.path.join(BASE_DIR, "data")
 JOBS_DIR     = os.path.join(DATA_DIR, "jobs")
 TOPICS_FILE  = os.path.join(DATA_DIR, "topics.json")
+DB_PATH      = os.path.join(DATA_DIR, "pipeline.db")

@@ -5,6 +5,35 @@ from collections import Counter
 
 logger = logging.getLogger(__name__)
 
+# Palavras que indicam intenção comercial — aumentam o score do tópico
+_COMMERCIAL_SIGNALS = [
+    "melhor", "vale a pena", "onde comprar", "review", "barato",
+    "custo beneficio", "qual comprar", "comparativo", "top", "recomendo",
+]
+_COMMERCIAL_BOOST = 15  # pontos extras por sinal comercial detectado
+
+
+def _commercial_intent_boost(keyword):
+    """Retorna boost de score se o keyword tem intenção de compra."""
+    kw_lower = keyword.lower()
+    for signal in _COMMERCIAL_SIGNALS:
+        if signal in kw_lower:
+            return _COMMERCIAL_BOOST
+    return 0
+
+
+def _expand_with_commercial_keywords(seed_keywords):
+    """
+    Expande cada seed keyword com variações comerciais para capturar
+    tópicos de alta intenção de compra além dos genéricos.
+    """
+    expanded = list(seed_keywords)
+    commercial_prefixes = ["melhor", "review", "vale a pena"]
+    for kw in seed_keywords[:3]:  # limita para não explodir a lista
+        for prefix in commercial_prefixes:
+            expanded.append(f"{prefix} {kw}")
+    return expanded[:10]  # pytrends aceita no máximo 5, YouTube aceita mais
+
 
 def _score_from_values(values):
     if not values:
@@ -77,15 +106,27 @@ def _slugify(text):
 def collect_topics(seed_keywords, max_topics=5):
     """
     Coleta tópicos em alta via Google Trends + YouTube.
+    Aplica boost de intenção comercial no score.
     Retorna lista de dicts: title, slug, score, top_keywords.
     """
     logger.info("Coletando tópicos em alta...")
 
-    trend_scores = _get_google_trends(seed_keywords)
-    topics = []
+    # Expande com variações comerciais para enriquecer a busca
+    expanded = _expand_with_commercial_keywords(seed_keywords)
 
-    for keyword in seed_keywords:
-        base_score = trend_scores.get(keyword, 30)
+    trend_scores = _get_google_trends(seed_keywords)  # pytrends usa só os originais
+    topics = []
+    seen_slugs = set()
+
+    for keyword in expanded:
+        slug = _slugify(keyword)
+        if slug in seen_slugs:
+            continue
+        seen_slugs.add(slug)
+
+        # Score base do Google Trends (usa keyword original se disponível)
+        base_kw    = next((k for k in seed_keywords if k in keyword), keyword)
+        base_score = trend_scores.get(base_kw, 30)
 
         yt_results = _get_youtube_results(keyword)
         time.sleep(0.5)
@@ -97,15 +138,21 @@ def collect_topics(seed_keywords, max_topics=5):
             )
             yt_boost = min(20, int(views / 500_000))
 
+        # Boost por intenção comercial detectada na keyword
+        intent_boost = _commercial_intent_boost(keyword)
+
         top_kws = _top_keywords_from_titles(yt_results, keyword)
 
+        final_score = min(100, base_score + yt_boost + intent_boost)
+
         topics.append({
-            "title": keyword.title(),
-            "slug": _slugify(keyword),
-            "score": min(100, base_score + yt_boost),
+            "title":        keyword.title(),
+            "slug":         slug,
+            "score":        final_score,
             "top_keywords": top_kws,
+            "has_commercial_intent": intent_boost > 0,
         })
 
     topics.sort(key=lambda x: x["score"], reverse=True)
-    logger.info(f"Top tópicos: {[t['title'] for t in topics[:max_topics]]}")
+    logger.info(f"Top tópicos: {[(t['title'], t['score']) for t in topics[:max_topics]]}")
     return topics[:max_topics]

@@ -6,6 +6,46 @@ import logging
 logger = logging.getLogger(__name__)
 
 FPS = 25
+_encoder_cache = None
+
+
+def _detect_best_encoder():
+    """
+    Auto-detecta o melhor encoder H.264 disponível no FFmpeg:
+    AMD AMF (RX 580) > NVIDIA NVENC > CPU libx264 (fallback).
+    Resultado é cacheado — a detecção roda só uma vez por sessão.
+    """
+    global _encoder_cache
+    if _encoder_cache:
+        return _encoder_cache
+    try:
+        result = subprocess.run(
+            ["ffmpeg", "-encoders"],
+            capture_output=True, text=True, timeout=10
+        )
+        out = result.stdout
+        if "h264_amf" in out:
+            _encoder_cache = "h264_amf"
+        elif "h264_nvenc" in out:
+            _encoder_cache = "h264_nvenc"
+        else:
+            _encoder_cache = "libx264"
+    except Exception:
+        _encoder_cache = "libx264"
+    logger.info(f"Encoder detectado: {_encoder_cache}")
+    return _encoder_cache
+
+
+def _encoder_flags(encoder):
+    """Retorna os flags FFmpeg corretos para cada encoder."""
+    if encoder == "h264_amf":
+        # AMD RX 580 — hardware encoding via AMF
+        return ["-c:v", "h264_amf", "-quality", "balanced", "-rc", "cqp", "-qp_i", "22", "-qp_p", "24"]
+    if encoder == "h264_nvenc":
+        # NVIDIA — hardware encoding via NVENC
+        return ["-c:v", "h264_nvenc", "-preset", "p4", "-cq", "23"]
+    # CPU fallback
+    return ["-c:v", "libx264", "-preset", "fast", "-crf", "23"]
 
 
 def _check_ffmpeg():
@@ -125,13 +165,12 @@ def render_video(image_paths, tts_path, srt_path, output_path, music_path=None, 
         image_paths, srt_path, total_duration, has_music, n_images
     )
 
+    encoder = _detect_best_encoder()
     cmd += ["-filter_complex", filter_graph]
     cmd += ["-map", "[vfinal]", "-map", audio_map]
+    cmd += _encoder_flags(encoder)
     cmd += [
-        "-c:v", "libx264",
         "-c:a", "aac",
-        "-preset", "fast",
-        "-crf", "23",
         "-t", str(total_duration),
         "-r", str(FPS),
         "-ar", "44100",
@@ -139,7 +178,7 @@ def render_video(image_paths, tts_path, srt_path, output_path, music_path=None, 
         output_path,
     ]
 
-    logger.info(f"Renderizando: {output_path}")
+    logger.info(f"Renderizando [{encoder}]: {output_path}")
     logger.debug("Comando: " + " ".join(cmd))
 
     try:
@@ -227,16 +266,17 @@ def render_from_clips(clip_paths, tts_path, srt_path, output_path, music_path=No
             "-map", "[vfinal]", "-map", "1:a",
         ]
 
+    encoder = _detect_best_encoder()
+    cmd += _encoder_flags(encoder)
     cmd += [
-        "-c:v", "libx264", "-c:a", "aac",
-        "-preset", "fast", "-crf", "23",
+        "-c:a", "aac",
         "-t", str(total_duration),
         "-r", str(FPS), "-ar", "44100",
         "-movflags", "+faststart",
         output_path,
     ]
 
-    logger.info(f"Renderizando (Kling): {output_path}")
+    logger.info(f"Renderizando Kling [{encoder}]: {output_path}")
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
 
