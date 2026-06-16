@@ -73,16 +73,22 @@ def upload_video(video_path, title, description, tags, credentials_file,
         from googleapiclient.http import MediaFileUpload
         youtube = _build_client(credentials_file, token_file)
 
+        # Disclaimer de IA adicionado ao final da descrição
+        ai_disclaimer = "\n\n---\n⚠️ Este vídeo foi criado com auxílio de inteligência artificial."
+        full_description = description + ai_disclaimer
+
         body = {
             "snippet": {
-                "title":      title[:100],
-                "description": description,
-                "tags":       [t[:30] for t in tags[:10]],
-                "categoryId": _CATEGORY_TECH,
+                "title":       title[:100],
+                "description": full_description[:5000],
+                "tags":        [t[:30] for t in tags[:10]],
+                "categoryId":  _CATEGORY_TECH,
             },
             "status": {
                 "privacyStatus":           privacy,
                 "selfDeclaredMadeForKids": False,
+                # Disclosure obrigatório YouTube 2024 para conteúdo com IA
+                "containsSyntheticMedia":  True,
             },
         }
 

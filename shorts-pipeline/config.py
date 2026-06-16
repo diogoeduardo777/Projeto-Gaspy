@@ -25,15 +25,41 @@ UNSPLASH_ACCESS_KEY = os.getenv("UNSPLASH_ACCESS_KEY", "")
 AMAZON_AFFILIATE_TAG  = os.getenv("AMAZON_AFFILIATE_TAG", "")
 SHOPEE_AFFILIATE_ID   = os.getenv("SHOPEE_AFFILIATE_ID", "")
 
+# Telegram — link do canal para divulgar nos Shorts (ex: https://t.me/seucanal)
+TELEGRAM_CHANNEL = os.getenv("TELEGRAM_CHANNEL", "")
+
 # Kling AI (geração de vídeo por IA)
 KLING_ACCESS_KEY = os.getenv("KLING_ACCESS_KEY", "")
 KLING_SECRET_KEY = os.getenv("KLING_SECRET_KEY", "")
 
 # Pipeline
-NICHO         = "periféricos e tecnologia gadgets"
-SEED_KEYWORDS = ["mouse gamer", "teclado mecânico", "fone bluetooth", "headset gamer", "webcam"]
-MAX_VIDEOS    = 3
-MAX_TOPICS    = 5
+MAX_VIDEOS = 3
+MAX_TOPICS = 5
+
+# Nicho ativo: "tech", "sports" ou "both"
+# "both" mistura os dois nichos e aproveita sazonalidade (ex: Copa do Mundo)
+ACTIVE_NICHE = os.getenv("ACTIVE_NICHE", "tech")
+
+_KEYWORDS_TECH = [
+    "mouse gamer", "teclado mecânico", "fone bluetooth",
+    "headset gamer", "webcam",
+]
+
+_KEYWORDS_SPORTS = [
+    "chuteira society", "camisa cbf copa", "smartwatch esportivo",
+    "câmera de ação futebol", "caixinha bluetooth torcida",
+    "bola futebol campo",
+]
+
+if ACTIVE_NICHE == "sports":
+    NICHO         = "esportes e Copa do Mundo"
+    SEED_KEYWORDS = _KEYWORDS_SPORTS
+elif ACTIVE_NICHE == "both":
+    NICHO         = "tecnologia gadgets e esportes Copa do Mundo"
+    SEED_KEYWORDS = _KEYWORDS_TECH[:3] + _KEYWORDS_SPORTS[:3]
+else:
+    NICHO         = "periféricos e tecnologia gadgets"
+    SEED_KEYWORDS = _KEYWORDS_TECH
 
 # TTS
 TTS_VOICE = "pt-BR-FranciscaNeural"

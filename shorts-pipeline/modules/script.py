@@ -5,28 +5,34 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-_PROMPT_TEMPLATE = """Você é um roteirista especialista em vídeos curtos para YouTube Shorts.
-Crie um roteiro persuasivo em PT-BR coloquial para um Short de 30 segundos sobre: "{topic}".
-Palavras-chave de referência: {keywords}.
+_PROMPT_TEMPLATE = """Você é um roteirista criativo de YouTube Shorts com estilo bem-humorado e linguagem jovem PT-BR.
+Crie um roteiro ENGAJANTE e ENGRAÇADO para um Short de 30 segundos sobre: "{topic}".
+Nicho: {niche}. Palavras-chave: {keywords}.
 
-Estrutura obrigatória:
-- Gancho (0–3s): 1 frase impactante que prende atenção.
-- Benefícios (3–20s): 2–3 frases sobre as principais features/vantagens.
-- CTA (20–30s): 1 frase final pedindo para clicar no "link na descrição".
+REGRAS DE OURO:
+1. Gancho (0–3s): situação relatable, hipérbole leve ou pergunta provocativa. Deve fazer o espectador parar de rolar o feed.
+   Exemplos de estilo (adapte para o produto):
+   - "Minha mão recusou usar outro mouse depois desse."
+   - "Eu testei e minha torcida nunca mais foi igual."
+   - "Você tá perdendo dinheiro se ainda não tem isso."
+2. Benefícios (3–20s): 2–3 frases diretas, empolgadas, linguagem de quem usa no dia a dia. PROIBIDO inventar especificações técnicas exatas — mencione apenas benefícios gerais verificáveis (ex: "som incrível", "bateria dura o dia todo", "leve pra caramba").
+3. CTA (20–30s): urgência leve + "link na descrição". Ex: "Corre lá, tá baratinho agora."
+
+COMPLIANCE OBRIGATÓRIO: não afirme nada que não possa ser verificado. Sem especificações inventadas.
 
 Retorne SOMENTE um JSON válido, sem texto adicional, neste formato exato:
 {{
-  "script_short": "texto completo com todas as frases separadas por espaço",
-  "tts_text": "mesmo texto do script_short, limpo para narração",
-  "srt": "1\\n00:00:00,000 --> 00:00:03,000\\nFrase de gancho\\n\\n2\\n00:00:03,000 --> 00:00:20,000\\nFrases de benefícios\\n\\n3\\n00:00:20,000 --> 00:00:30,000\\nFrase de CTA",
+  "script_short": "texto completo do roteiro com todas as frases",
+  "tts_text": "mesmo texto limpo para narração em voz alta, sem emojis",
+  "srt": "1\\n00:00:00,000 --> 00:00:03,000\\nFrase gancho\\n\\n2\\n00:00:03,000 --> 00:00:20,000\\nFrases benefícios\\n\\n3\\n00:00:20,000 --> 00:00:30,000\\nFrase CTA",
   "video_prompts": [
-    "close-up of {topic} on a desk, dramatic studio lighting, cinematic 4K, hook scene",
-    "{topic} in action being used, hands interacting, clean background, product showcase",
-    "person smiling holding {topic}, bright lighting, thumbs up, call to action scene"
+    "close-up of {topic} with dramatic lighting, cinematic 4K, exciting hook scene",
+    "{topic} being used in action, energetic movement, clean colorful background",
+    "happy person giving thumbs up with {topic}, bright studio, call to action vibe"
   ],
-  "thumbnail_prompt": "texto grande em destaque + imagem do produto {topic} em fundo escuro",
-  "image_queries": ["{topic} product photo", "{topic} review setup"],
-  "music_style": "eletrônica leve 100–110 BPM sem vocal"
+  "thumbnail_prompt": "thumbnail impactante: texto grande e legível + {topic} em destaque, fundo escuro ou vibrante",
+  "image_queries": ["{topic} product photo white background", "{topic} lifestyle action"],
+  "music_style": "eletrônica animada 110–125 BPM sem vocal, energia alta"
 }}"""
 
 _REQUIRED_FIELDS = [
@@ -58,7 +64,7 @@ def _validate_fields(data, topic):
     return data
 
 
-def _generate_groq(topic, keywords, api_key, model):
+def _generate_groq(topic, keywords, api_key, model, niche="tecnologia"):
     """Gera roteiro via Groq API (Llama 3.3 70B na nuvem, grátis)."""
     try:
         from groq import Groq
@@ -70,7 +76,7 @@ def _generate_groq(topic, keywords, api_key, model):
         logger.error("GROQ_API_KEY não configurado. Cadastre-se em console.groq.com")
         return None
 
-    prompt = _PROMPT_TEMPLATE.format(topic=topic, keywords=", ".join(keywords))
+    prompt = _PROMPT_TEMPLATE.format(topic=topic, keywords=", ".join(keywords), niche=niche)
 
     try:
         client = Groq(api_key=api_key)
@@ -94,9 +100,9 @@ def _generate_groq(topic, keywords, api_key, model):
         return None
 
 
-def _generate_ollama(topic, keywords, base_url, model):
+def _generate_ollama(topic, keywords, base_url, model, niche="tecnologia"):
     """Gera roteiro via Ollama local."""
-    prompt = _PROMPT_TEMPLATE.format(topic=topic, keywords=", ".join(keywords))
+    prompt = _PROMPT_TEMPLATE.format(topic=topic, keywords=", ".join(keywords), niche=niche)
 
     try:
         response = requests.post(
@@ -133,7 +139,8 @@ def _generate_ollama(topic, keywords, base_url, model):
 
 def generate_script(topic, keywords, provider="ollama",
                     groq_api_key=None, groq_model=None,
-                    ollama_base_url=None, ollama_model=None):
+                    ollama_base_url=None, ollama_model=None,
+                    niche="tecnologia"):
     """
     Gera roteiro via Groq (nuvem, recomendado) ou Ollama (local).
     Controlado por LLM_PROVIDER no .env.
@@ -141,6 +148,6 @@ def generate_script(topic, keywords, provider="ollama",
     logger.info(f"Gerando roteiro [{provider.upper()}]: {topic}")
 
     if provider == "groq":
-        return _generate_groq(topic, keywords, groq_api_key, groq_model)
+        return _generate_groq(topic, keywords, groq_api_key, groq_model, niche)
     else:
-        return _generate_ollama(topic, keywords, ollama_base_url, ollama_model)
+        return _generate_ollama(topic, keywords, ollama_base_url, ollama_model, niche)

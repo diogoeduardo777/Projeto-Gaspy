@@ -53,6 +53,7 @@ def process_topic(topic, tracker):
         groq_model=config.GROQ_MODEL,
         ollama_base_url=config.OLLAMA_BASE_URL,
         ollama_model=config.OLLAMA_MODEL,
+        niche=config.NICHO,
     )
     if not script_data:
         logger.error(f"Roteiro falhou para '{topic['title']}'. Pulando.")
@@ -124,7 +125,8 @@ def process_topic(topic, tracker):
     amazon_link = generate_amazon_link(topic["top_keywords"], config.AMAZON_AFFILIATE_TAG)
     shopee_link = generate_shopee_link(topic["top_keywords"], config.SHOPEE_AFFILIATE_ID)
     save_publish_assets(job_dir, topic["title"], slug, script_data["script_short"],
-                        amazon_link, shopee_link, topic["top_keywords"])
+                        amazon_link, shopee_link, topic["top_keywords"],
+                        telegram_channel=config.TELEGRAM_CHANNEL)
 
     # 9. Upload automático YouTube (se YOUTUBE_AUTO_UPLOAD=true)
     youtube_id  = None

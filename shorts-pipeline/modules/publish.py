@@ -46,7 +46,7 @@ def generate_shopee_link(keywords, affiliate_id):
     return f"{_SHOPEE_SEARCH_URL}?keyword={query}&af_id={affiliate_id}"
 
 
-def generate_description(topic_title, script_short, amazon_link, shopee_link, top_keywords):
+def generate_description(topic_title, script_short, amazon_link, shopee_link, top_keywords, telegram_channel=""):
     """
     Gera texto de descrição para o YouTube com CTA e hashtags.
     Inclui disclaimer de afiliado obrigatório por lei brasileira (CDC).
@@ -64,6 +64,14 @@ def generate_description(topic_title, script_short, amazon_link, shopee_link, to
     if not amazon_link and not shopee_link:
         lines += ["Pesquise o produto no link da bio!", ""]
 
+    if telegram_channel:
+        lines += [
+            "---",
+            "",
+            f"📢 Ofertas diárias no Telegram: {telegram_channel}",
+            "",
+        ]
+
     lines += [
         "---",
         "",
@@ -75,14 +83,14 @@ def generate_description(topic_title, script_short, amazon_link, shopee_link, to
     return "\n".join(lines)
 
 
-def save_publish_assets(job_dir, topic_title, slug, script_short, amazon_link, shopee_link, top_keywords):
+def save_publish_assets(job_dir, topic_title, slug, script_short, amazon_link, shopee_link, top_keywords, telegram_channel=""):
     """
     Salva description.txt e affiliate_link.txt no diretório do job.
     Retorna (desc_path, link_path).
     """
     os.makedirs(job_dir, exist_ok=True)
 
-    description = generate_description(topic_title, script_short, amazon_link, shopee_link, top_keywords)
+    description = generate_description(topic_title, script_short, amazon_link, shopee_link, top_keywords, telegram_channel)
 
     desc_path   = os.path.join(job_dir, "description.txt")
     amazon_path = os.path.join(job_dir, "link_amazon.txt")
