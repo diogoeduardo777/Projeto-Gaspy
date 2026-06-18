@@ -79,6 +79,7 @@ def _post_rss(open_shopee):
         amazon_url=product["url"],   # link direto do produto com tag
         shopee_url=open_shopee,      # busca aberta Shopee
         price=product.get("price"),
+        youtube_channel=config.YOUTUBE_CHANNEL,
     )
 
     ok = send_message(
@@ -114,7 +115,7 @@ def _post_physical(open_amazon, open_shopee):
         shopee_id=config.SHOPEE_AFFILIATE_ID,
     )
 
-    full_text = build_full_message(deal_text, keyword_amazon, keyword_shopee)
+    full_text = build_full_message(deal_text, keyword_amazon, keyword_shopee, youtube_channel=config.YOUTUBE_CHANNEL)
     ok = send_message(
         config.TELEGRAM_BOT_TOKEN,
         config.TELEGRAM_CHANNEL_ID,
@@ -148,6 +149,7 @@ def _post_digital(open_amazon, open_shopee):
         amazon_url=open_amazon,
         shopee_url=open_shopee,
         hotmart_url=product["link"],
+        youtube_channel=config.YOUTUBE_CHANNEL,
     )
 
     ok = send_message(

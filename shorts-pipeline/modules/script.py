@@ -18,10 +18,17 @@ REGRAS DE OURO:
 2. Benefícios (3–20s): 2–3 frases diretas, empolgadas, linguagem de quem usa no dia a dia. PROIBIDO inventar especificações técnicas exatas — mencione apenas benefícios gerais verificáveis (ex: "som incrível", "bateria dura o dia todo", "leve pra caramba").
 3. CTA (20–30s): urgência leve + "link na descrição". Ex: "Corre lá, tá baratinho agora."
 
+LINGUAGEM OBRIGATÓRIA:
+- Use gírias brasileiras naturais: "cara", "mano", "galera", "bicho", "tipo", "né", "aí", "então", "pra caramba"
+- Fale como conversa entre amigos, NÃO como locutor de comercial
+- Varie o comprimento das frases — misture frases curtas e longas
+- O tts_text deve soar 100% natural quando falado em voz alta
+
 COMPLIANCE OBRIGATÓRIO: não afirme nada que não possa ser verificado. Sem especificações inventadas.
 
 Retorne SOMENTE um JSON válido, sem texto adicional, neste formato exato:
 {{
+  "seo_title": "título YouTube otimizado para busca com ano 2026, sem #Shorts — ex: 'Mouse Gamer Barato 2026: Vale a Pena MESMO?'",
   "script_short": "texto completo do roteiro com todas as frases",
   "tts_text": "mesmo texto limpo para narração em voz alta, sem emojis",
   "srt": "1\\n00:00:00,000 --> 00:00:03,000\\nFrase gancho\\n\\n2\\n00:00:03,000 --> 00:00:20,000\\nFrases benefícios\\n\\n3\\n00:00:20,000 --> 00:00:30,000\\nFrase CTA",
@@ -36,7 +43,7 @@ Retorne SOMENTE um JSON válido, sem texto adicional, neste formato exato:
 }}"""
 
 _REQUIRED_FIELDS = [
-    "script_short", "tts_text", "srt",
+    "seo_title", "script_short", "tts_text", "srt",
     "thumbnail_prompt", "image_queries", "music_style", "video_prompts",
 ]
 _LIST_FIELDS = {"image_queries", "video_prompts"}

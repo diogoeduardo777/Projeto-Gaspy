@@ -42,7 +42,8 @@ ACTIVE_NICHE = os.getenv("ACTIVE_NICHE", "tech")
 
 _KEYWORDS_TECH = [
     "mouse gamer", "teclado mecânico", "fone bluetooth",
-    "headset gamer", "webcam",
+    "headset gamer", "webcam full hd", "monitor gamer",
+    "ssd externo", "carregador turbo", "hub usb",
 ]
 
 _KEYWORDS_SPORTS = [
@@ -63,7 +64,7 @@ else:
 
 # TTS
 TTS_VOICE = "pt-BR-FranciscaNeural"
-TTS_RATE  = "+10%"
+TTS_RATE  = "+5%"
 
 # Vídeo
 VIDEO_WIDTH        = 1080

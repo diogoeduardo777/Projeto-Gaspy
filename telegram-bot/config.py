@@ -15,6 +15,9 @@ GROQ_MODEL   = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 AMAZON_AFFILIATE_TAG = os.getenv("AMAZON_AFFILIATE_TAG", "")
 SHOPEE_AFFILIATE_ID  = os.getenv("SHOPEE_AFFILIATE_ID", "")
 
+# YouTube — link do canal para cross-promotion nas mensagens Telegram (ex: https://youtube.com/@seucanal)
+YOUTUBE_CHANNEL = os.getenv("YOUTUBE_CHANNEL", "")
+
 # Nicho
 ACTIVE_NICHE = os.getenv("ACTIVE_NICHE", "tech")
 

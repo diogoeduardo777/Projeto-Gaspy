@@ -35,7 +35,7 @@ def send_message(bot_token, channel_id, text, disable_web_page_preview=False):
         return False
 
 
-def build_full_message(deal_text, amazon_url, shopee_url, hotmart_url=None, price=None):
+def build_full_message(deal_text, amazon_url, shopee_url, hotmart_url=None, price=None, youtube_channel=""):
     """Monta a mensagem final com links de afiliado.
 
     - hotmart_url: produto digital em destaque + links abertos Amazon/Shopee embaixo
@@ -63,5 +63,9 @@ def build_full_message(deal_text, amazon_url, shopee_url, hotmart_url=None, pric
     if amazon_url or shopee_url or hotmart_url:
         lines.append("")
         lines.append("⚠️ <i>Links de afiliado — comprar por eles apoia o canal sem custo extra para você.</i>")
+
+    if youtube_channel:
+        lines.append("")
+        lines.append(f"📺 <b>Shorts no YouTube:</b> {youtube_channel}")
 
     return "\n".join(lines)

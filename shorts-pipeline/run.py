@@ -136,10 +136,11 @@ def process_topic(topic, tracker):
         with open(os.path.join(job_dir, "description.txt"), encoding="utf-8") as f:
             description_text = f.read()
 
-        yt_title   = f"{topic['title']} - Vale a pena? #Shorts"
+        yt_title   = script_data.get("seo_title") or f"{topic['title']} - Vale a pena? #Shorts"
+        extra_tags = ["review", "vale a pena", "gadgets", "2026", "Shorts"]
         youtube_id = upload_video(
             video_path=output_path, title=yt_title, description=description_text,
-            tags=topic["top_keywords"], credentials_file=config.YOUTUBE_CREDENTIALS_FILE,
+            tags=topic["top_keywords"] + extra_tags, credentials_file=config.YOUTUBE_CREDENTIALS_FILE,
             token_file=config.YOUTUBE_TOKEN_FILE, privacy=config.YOUTUBE_PRIVACY,
         )
 
