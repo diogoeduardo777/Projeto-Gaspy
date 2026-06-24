@@ -1,0 +1,413 @@
+Guia Passo a Passo — Do Zero ao Funcionando
+Máquina: Windows 10 | i7 3ª gen | 16GB RAM | Radeon RX 580
+
+
+
+Sua ID exclusiva de Associado é amazonbras09-20
+
+link afiliado shoope https://collshp.com/diogoeduardotaboada997
+
+
+
+PASSO 1 — Instalar Python
+
+Abra o navegador e acesse: python.org/downloads
+
+Clique no botão amarelo Download Python 3.11.x
+
+Abra o instalador baixado
+
+IMPORTANTE: Antes de clicar em qualquer coisa, marque a caixinha Add Python.exe to PATH que fica na parte de baixo da janela
+
+Clique em Install Now
+
+Quando terminar, clique em Close
+
+Verificar se funcionou:
+
+Aperte Win + R → digite cmd → Enter
+
+No terminal preto que abriu, digite: python --version
+
+Deve aparecer algo como: Python 3.11.9
+
+PASSO 2 — Instalar FFmpeg
+
+Acesse: gyan.dev/ffmpeg/builds
+
+Na seção "release builds", clique em ffmpeg-release-essentials.zip
+
+Aguarde baixar (é grande, ~90 MB)
+
+Clique com botão direito no arquivo ZIP → Extrair tudo...
+
+Extraia para C:\ (a raiz do C)
+
+Entre na pasta extraída (ex: C:\ffmpeg-6.1-essentials_build)
+
+Renomeie essa pasta para simplesmente ffmpeg
+
+Resultado: C:\ffmpeg\bin\ffmpeg.exe deve existir
+
+Adicionar ao PATH (para o terminal reconhecer):
+
+Aperte Win → pesquise "variáveis de ambiente" → clique em Editar as variáveis de ambiente do sistema
+
+Clique no botão Variáveis de Ambiente... (parte de baixo)
+
+Na seção Variáveis do sistema (parte de baixo da janela), clique em Path → clique Editar
+
+Clique em Novo → digite: C:\ffmpeg\bin
+
+Clique OK → OK → OK
+
+Feche e reabra o terminal
+
+Verificar se funcionou:
+
+No terminal: ffmpeg -version
+
+Deve aparecer várias linhas começando com ffmpeg version
+
+PASSO 3 — Copiar o Projeto para o PC
+
+Copie a pasta "teste 2" do seu computador atual para o PC de casa (pendrive, Google Drive, HD externo).
+
+Coloque em um lugar fácil, sugerido: C:\projetos\teste 2
+
+PASSO 4 — Instalar Dependências dos Projetos
+
+Abra o terminal (cmd) e execute os comandos abaixo, um de cada vez:
+
+Pipeline de vídeos:
+
+bash
+cd "C:\projetos\teste 2\shorts-pipeline"
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+Vai demorar 2–5 minutos baixando as bibliotecas. Normal.
+
+Bot do Telegram:
+
+bash
+cd "C:\projetos\teste 2\telegram-bot"
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+PASSO 5 — Criar Conta Groq e Pegar API Key
+
+O Groq é a IA que escreve os roteiros dos vídeos e as mensagens do bot. É gratuito.
+
+Acesse: console.groq.com
+
+Clique em Sign Up → crie conta com e‑mail ou Google
+
+Após entrar, clique em API Keys no menu lateral esquerdo
+
+Clique em Create API Key
+
+Dê um nome qualquer (ex: "pipeline")
+
+Copie a chave — ela começa com gsk_ e é longa
+
+Guarde essa chave — você vai colar ela em dois lugares (pipeline e bot)
+
+PASSO 6 — Criar Conta Unsplash e Pegar API Key
+
+O Unsplash fornece fotos gratuitas para os vídeos.
+
+Acesse: unsplash.com/developers
+
+Clique em Register as a developer
+
+Crie conta ou entre com conta existente
+
+Após entrar, clique em New Application
+
+Marque todas as caixinhas de aceite → clique Accept terms
+
+Preencha:
+
+Application name: pipeline-shorts
+
+Description: Geração automática de vídeos
+
+Clique em Create application
+
+Role a página para baixo até Keys
+
+Copie o Access Key (não o Secret Key)
+
+PASSO 7 — Criar Bot no Telegram e Canal
+
+Criar o bot:
+
+Abra o Telegram no celular ou PC
+
+Na busca, procure: @BotFather
+
+Clique nele → clique Iniciar ou Start
+
+Digite: /newbot
+
+Ele vai pedir um nome para o bot — coloque algo como: Ofertas Tech BR
+
+Vai pedir um username (termina em bot) — coloque algo como: ofertastechbr_bot
+
+Ele vai responder com uma mensagem contendo o token — parece assim:
+123456789:AABBccDDeeFFggHHiiJJkkLLmmNNoo
+
+Copie esse token completo
+
+Criar o canal:
+
+No Telegram, clique no ícone de lápis/editar → Novo Canal
+
+Dê um nome ao canal (ex: Ofertas Tech & Gadgets)
+
+Escreva uma descrição curta
+
+Escolha Canal Público
+
+Defina o link do canal (ex: ofertastechgadgets)
+
+Anote o nome: @ofertastechgadgets
+
+Adicionar o bot como admin do canal:
+
+Entre no canal que criou
+
+Clique no nome do canal no topo → Administradores
+
+Clique em Adicionar Administrador
+
+Pesquise pelo username do bot (ex: ofertastechbr_bot)
+
+Clique nele → clique Salvar
+
+PASSO 8 — Configurar o .env do Pipeline de Vídeos
+
+Abra o Explorador de Arquivos
+
+Navegue até: C:\projetos\teste 2\shorts-pipeline
+
+Você vai ver o arquivo .env.example
+
+Copie esse arquivo e renomeie a cópia para .env (sem o .example)
+IMPORTANTE: Se o Windows não deixar ver a extensão, no Explorador vá em Exibir → Extensões de nome de arquivo e marque.
+
+Clique com botão direito no .env → Abrir com → Bloco de Notas
+
+Preencha cada linha:
+
+Código
+LLM_PROVIDER=groq
+GROQ_API_KEY=               # cole aqui a chave gsk_ do Passo 5
+GROQ_MODEL=llama-3.3-70b-versatile
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.1
+UNSPLASH_ACCESS_KEY=        # cole aqui a Access Key do Passo 6
+AMAZON_AFFILIATE_TAG=       # preencher depois (Passo 11)
+SHOPEE_AFFILIATE_ID=        # preencher depois (Passo 12)
+KLING_ACCESS_KEY=           # deixar vazio por enquanto
+KLING_SECRET_KEY=           # deixar vazio por enquanto
+ACTIVE_NICHE=tech
+VIDEO_ENCODER=auto
+YOUTUBE_AUTO_UPLOAD=false
+YOUTUBE_CREDENTIALS_FILE=client_secrets.json
+YOUTUBE_TOKEN_FILE=token.json
+YOUTUBE_PRIVACY=private
+TELEGRAM_CHANNEL=           # cole aqui o link do canal (ex: https://t.me/ofertastechgadgets)
+Salve o arquivo (Ctrl + S)
+
+PASSO 9 — Configurar o .env do Bot do Telegram
+
+Navegue até: C:\projetos\teste 2\telegram-bot
+
+Copie .env.example → renomeie para .env
+
+Abra com Bloco de Notas e preencha:
+
+Código
+TELEGRAM_BOT_TOKEN=         # cole aqui o token do BotFather do Passo 7
+TELEGRAM_CHANNEL_ID=        # cole aqui @seucanal (ex: @ofertastechgadgets)
+GROQ_API_KEY=               # mesma chave gsk_ do Passo 5
+GROQ_MODEL=llama-3.3-70b-versatile
+AMAZON_AFFILIATE_TAG=       # preencher depois (Passo 11)
+SHOPEE_AFFILIATE_ID=        # preencher depois (Passo 12)
+ACTIVE_NICHE=tech
+POST_HOURS=8,13,20
+Salve o arquivo
+
+PASSO 10 — Testar os Dois Projetos
+
+Testar o pipeline de vídeos:
+
+bash
+cd "C:\projetos\teste 2\shorts-pipeline"
+venv\Scripts\activate
+python run.py
+Aguarde ~5 minutos. No final deve aparecer:
+=== Concluído: 3/3 vídeos gerados ===
+
+Verifique os vídeos em: C:\projetos\teste 2\shorts-pipeline\data\jobs\
+
+Testar o bot do Telegram:
+
+bash
+cd "C:\projetos\teste 2\telegram-bot"
+venv\Scripts\activate
+python run.py --now
+Abra o Telegram — deve ter chegado uma mensagem no canal.
+
+PASSO 11 — Cadastrar Amazon Afiliados
+
+Faça isso no mesmo dia, pois demora alguns dias para aprovação.
+
+Acesse: associados.amazon.com.br
+
+Clique em Inscreva-se agora
+
+Entre com sua conta Amazon (ou crie uma)
+
+Preencha o formulário:
+
+Site/app: coloque o link do canal do YouTube ou Telegram
+
+Descreva brevemente: "Canal de reviews de tecnologia e gadgets"
+
+Após aprovação (3–7 dias), acesse o painel
+
+Seu tag de afiliado aparece no topo da página — formato: seunome-20
+
+Abra os dois .env e preencha AMAZON_AFFILIATE_TAG=seunome-20
+
+PASSO 12 — Cadastrar Shopee Afiliados
+
+Acesse: affiliate.shopee.com.br
+
+Clique em Registrar agora
+
+Crie conta ou entre com conta Shopee existente
+
+Preencha o formulário com os dados do canal
+
+Após aprovação (2–5 dias), acesse o painel
+
+Copie seu Affiliate ID (número no painel)
+
+Abra os dois .env e preencha SHOPEE_AFFILIATE_ID=seu_id
+
+PASSO 13 — Configurar Hotmart (Produtos Digitais)
+
+Acesse: hotmart.com → clique em Seja um Afiliado
+
+Crie conta gratuita
+
+No painel, clique em Marketplace
+
+Filtre por categoria (ex: Tecnologia, Produtividade)
+
+Escolha produtos com boa avaliação (4+ estrelas) e com comissão acima de 30%
+
+Clique em Afiliar-se → copie o link https://go.hotmart.com/XXXXX
+
+Abra C:\projetos\teste 2\telegram-bot\config.py no Bloco de Notas
+
+Localize o trecho DIGITAL_PRODUCTS = [ e adicione seus produtos:
+
+python
+DIGITAL_PRODUCTS = [
+    {"name": "Nome do Curso", "link": "https://go.hotmart.com/XXXXX", "category": "tecnologia"},
+    {"name": "Outro Produto", "link": "https://go.hotmart.com/YYYYY", "category": "produtividade"},
+]
+PASSO 14 — Configurar YouTube (quando quiser ativar upload automático)
+
+Acesse: console.cloud.google.com
+
+No topo, clique em Selecionar projeto → Novo Projeto
+
+Nome: pipeline-shorts → clique Criar
+
+No menu lateral: APIs e Serviços → Biblioteca
+
+Pesquise: YouTube Data API v3 → clique nela → clique Ativar
+
+No menu lateral: Credenciais → Criar Credenciais → ID do cliente OAuth
+
+Se pedir para configurar tela de consentimento: escolha Externo → preencha nome do app → salvar
+
+Tipo de aplicativo: App para computador → nome: pipeline → Criar
+
+Clique em Baixar JSON no popup que aparecer
+
+Renomeie o arquivo baixado para: client_secrets.json
+
+Mova para: C:\projetos\teste 2\shorts-pipeline\
+
+No .env do pipeline: mude YOUTUBE_AUTO_UPLOAD=true e YOUTUBE_PRIVACY=public
+
+Rode python run.py → o navegador vai abrir pedindo para autorizar → aceite
+
+O arquivo token.json é criado automaticamente — próximas vezes é automático
+
+PASSO 15 — Deixar Tudo Automático
+
+Abrir o bot do Telegram no login do Windows:
+
+Aperte Win + R → digite shell:startup → Enter
+
+Crie um arquivo bot.bat com o Bloco de Notas:
+
+bat
+cd "C:\projetos\teste 2\telegram-bot"
+call venv\Scripts\activate
+python run.py
+Salve como bot.bat e coloque na pasta que abriu
+
+Agendar o pipeline de vídeos para rodar todo dia:
+
+Pesquise no Windows: Agendador de Tarefas
+
+Clique em Criar Tarefa Básica
+
+Nome: Pipeline Shorts
+
+Disparar: Diariamente → horário: 07:00
+
+Ação: Iniciar um programa
+
+Programa: C:\projetos\teste 2\shorts-pipeline\venv\Scripts\python.exe
+
+Argumentos: run.py
+
+Iniciar em: C:\projetos\teste 2\shorts-pipeline
+
+Clique em Concluir
+
+Resumo da Ordem no Primeiro Dia
+
+Instalar Python → verificar no terminal
+
+Instalar FFmpeg → verificar no terminal
+
+Copiar projeto para o PC
+
+pip install nos dois projetos
+
+Criar conta Groq → copiar chave
+
+Criar conta Unsplash → copiar chave
+
+Criar bot Telegram + canal
+
+Preencher .env do pipeline
+
+Preencher .env do bot
+
+python run.py no pipeline → verificar vídeo gerado
+
+python run.py --now no bot → verificar mensagem no canal
+
+Cadastrar Amazon e Shopee (aguardar aprovação em dias seguintes)

@@ -22,8 +22,9 @@ YOUTUBE_PRIVACY          = os.getenv("YOUTUBE_PRIVACY", "private")
 UNSPLASH_ACCESS_KEY = os.getenv("UNSPLASH_ACCESS_KEY", "")
 
 # Afiliados
-AMAZON_AFFILIATE_TAG  = os.getenv("AMAZON_AFFILIATE_TAG", "")
-SHOPEE_AFFILIATE_ID   = os.getenv("SHOPEE_AFFILIATE_ID", "")
+AMAZON_AFFILIATE_TAG       = os.getenv("AMAZON_AFFILIATE_TAG", "")
+SHOPEE_AFFILIATE_ID        = os.getenv("SHOPEE_AFFILIATE_ID", "")
+MERCADOLIVRE_AFFILIATE_ID  = os.getenv("MERCADOLIVRE_AFFILIATE_ID", "")
 
 # Telegram — link do canal para divulgar nos Shorts (ex: https://t.me/seucanal)
 TELEGRAM_CHANNEL = os.getenv("TELEGRAM_CHANNEL", "")

@@ -31,9 +31,9 @@ def generate_tts(text, output_path, voice="pt-BR-FranciscaNeural", rate="+10%"):
         return False
 
 
-def download_images(queries, output_dir, unsplash_key, max_images=3):
+def download_images(queries, output_dir, unsplash_key, max_images=12):
     """
-    Baixa imagens portrait do Unsplash para uso como base do slideshow.
+    Baixa imagens portrait em alta resolução do Unsplash.
     Requer UNSPLASH_ACCESS_KEY (gratuito em unsplash.com/developers).
     Retorna lista de paths das imagens baixadas.
     """
@@ -47,21 +47,43 @@ def download_images(queries, output_dir, unsplash_key, max_images=3):
     os.makedirs(output_dir, exist_ok=True)
     downloaded = []
 
-    for i, query in enumerate(queries[:2]):
+    # 8 sufixos variados: produto, lifestyle, ação, detalhe, estudio...
+    style_suffixes = [
+        "product photography clean white background",
+        "close up macro detail cinematic",
+        "tech gadget review hands on lifestyle",
+        "unboxing premium packaging",
+        "studio lighting product shot",
+        "action shot dynamic movement",
+        "dark background dramatic light",
+        "flat lay minimal aesthetic",
+    ]
+
+    for i, query in enumerate(queries[:6]):  # até 6 queries para variedade máxima
+        suffix = style_suffixes[i % len(style_suffixes)]
+        enhanced_query = f"{query} {suffix}"
+
         try:
             resp = requests.get(
                 "https://api.unsplash.com/search/photos",
-                params={"query": query, "per_page": 2, "orientation": "portrait"},
+                params={
+                    "query": enhanced_query,
+                    "per_page": 4,
+                    "orientation": "portrait",
+                    "order_by": "relevant",
+                    "content_filter": "high",
+                },
                 headers={"Authorization": f"Client-ID {unsplash_key}"},
                 timeout=15,
             )
             resp.raise_for_status()
 
-            for j, photo in enumerate(resp.json().get("results", [])[:2]):
-                img_url = photo["urls"]["regular"]
+            for j, photo in enumerate(resp.json().get("results", [])[:4]):
+                # "full" em vez de "regular" → resolução máxima para melhor qualidade de vídeo
+                img_url = photo["urls"]["full"]
                 img_path = os.path.join(output_dir, f"img_{i}_{j}.jpg")
 
-                img_resp = requests.get(img_url, timeout=30, stream=True)
+                img_resp = requests.get(img_url, timeout=60, stream=True)
                 img_resp.raise_for_status()
 
                 with open(img_path, "wb") as f:
@@ -84,27 +106,40 @@ def download_images(queries, output_dir, unsplash_key, max_images=3):
 
 def download_music(output_path):
     """
-    Baixa trilha royalty-free curta para fundo do vídeo.
-    Fonte: Free Music Archive (CC0).
-    Retorna True se sucesso, False caso contrário (vídeo será gerado sem música).
+    Baixa trilha royalty-free CC0 animada para fundo do vídeo.
+    Tenta múltiplas fontes — continua sem música se todas falharem.
     """
-    # Trilha CC0 do Free Music Archive
-    url = (
-        "https://files.freemusicarchive.org/storage-freemusicarchive-org/"
-        "music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3"
-    )
+    _MUSIC_SOURCES = [
+        # Free Music Archive — CC0
+        (
+            "https://files.freemusicarchive.org/storage-freemusicarchive-org/"
+            "music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3"
+        ),
+        # Pixabay royalty-free (backup)
+        "https://cdn.pixabay.com/audio/2023/03/14/audio_fb7c4a4406.mp3",
+        # ccMixter backup
+        "https://dig.ccmixter.org/api/tags/hip_hop?format=mp3&order=random&limit=1",
+    ]
 
-    try:
-        resp = requests.get(url, timeout=30, stream=True)
-        resp.raise_for_status()
+    for url in _MUSIC_SOURCES:
+        try:
+            resp = requests.get(url, timeout=30, stream=True)
+            resp.raise_for_status()
 
-        with open(output_path, "wb") as f:
-            for chunk in resp.iter_content(chunk_size=8192):
-                f.write(chunk)
+            content_type = resp.headers.get("Content-Type", "")
+            if "audio" not in content_type and "octet" not in content_type:
+                continue
 
-        logger.info(f"Música baixada: {output_path}")
-        return True
+            with open(output_path, "wb") as f:
+                for chunk in resp.iter_content(chunk_size=8192):
+                    f.write(chunk)
 
-    except Exception as e:
-        logger.warning(f"Não foi possível baixar música de fundo: {e}")
-        return False
+            if os.path.getsize(output_path) > 50_000:  # mínimo 50KB válido
+                logger.info(f"Música baixada: {output_path}")
+                return True
+
+        except Exception as e:
+            logger.debug(f"Fonte de música falhou ({url[:50]}): {e}")
+
+    logger.warning("Não foi possível baixar música de fundo — vídeo sem trilha.")
+    return False

@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Env — nunca commitar credenciais
+.env
+
+# Logs
+*.log
+
+# Shorts pipeline — vídeos são grandes, não commitar
+shorts-pipeline/data/jobs/
+shorts-pipeline/data/topics.json
+
+# Manter: pipeline.db (histórico de jobs) e state.json (rotação de keywords)
+!shorts-pipeline/data/pipeline.db
+!telegram-bot/data/state.json
+
+# YouTube OAuth tokens — guardar como GitHub Secret, não commitar
+shorts-pipeline/client_secrets.json
+shorts-pipeline/token.json

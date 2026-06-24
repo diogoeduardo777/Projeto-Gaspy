@@ -5,41 +5,52 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-_PROMPT_TEMPLATE = """Você é um roteirista criativo de YouTube Shorts com estilo bem-humorado e linguagem jovem PT-BR.
-Crie um roteiro ENGAJANTE e ENGRAÇADO para um Short de 30 segundos sobre: "{topic}".
+_PROMPT_TEMPLATE = """Você é um roteirista VIRAL de YouTube Shorts — especialista em fazer o dedo parar de rolar.
+Crie um roteiro ALTAMENTE ENGAJANTE para um Short de 30 segundos sobre: "{topic}".
 Nicho: {niche}. Palavras-chave: {keywords}.
 
-REGRAS DE OURO:
-1. Gancho (0–3s): situação relatable, hipérbole leve ou pergunta provocativa. Deve fazer o espectador parar de rolar o feed.
-   Exemplos de estilo (adapte para o produto):
-   - "Minha mão recusou usar outro mouse depois desse."
-   - "Eu testei e minha torcida nunca mais foi igual."
-   - "Você tá perdendo dinheiro se ainda não tem isso."
-2. Benefícios (3–20s): 2–3 frases diretas, empolgadas, linguagem de quem usa no dia a dia. PROIBIDO inventar especificações técnicas exatas — mencione apenas benefícios gerais verificáveis (ex: "som incrível", "bateria dura o dia todo", "leve pra caramba").
-3. CTA (20–30s): urgência leve + "link na descrição". Ex: "Corre lá, tá baratinho agora."
+ESTRUTURA OBRIGATÓRIA:
+1. GANCHO VIRAL (0–3s): Frase que CHOCA ou INTRIGA. Hipérbole, situação relatable extrema, ou segredo revelado.
+   Exemplos REAIS de ganchos que funcionam (adapte ao produto):
+   - "Gastei R$2.000 em headset e esse de R$300 venceu no teste cego."
+   - "Seis meses atrás eu não sabia que isso existia. Agora não consigo largar."
+   - "Todo mundo tá comprando isso errado. Deixa eu te mostrar o correto."
+   - "Isso aqui vai mudar o jeito que você [usa/joga/torce] pra sempre."
+   - "Testei 7 produtos assim. Só esse sobreviveu."
+2. BENEFÍCIOS COM PROVA (3–20s): 3 frases diretas com comparações e reações reais. Sem especificações inventadas.
+   Use: "comparado com o anterior", "minha namorada/amigo/colega falou", "no dia a dia faz diferença".
+3. CTA URGENTE (20–30s): Urgência real + prova social + "link na descrição".
+   Ex: "Todo mundo que comprou voltou pra me agradecer. Link na descrição antes de acabar o estoque."
 
-LINGUAGEM OBRIGATÓRIA:
-- Use gírias brasileiras naturais: "cara", "mano", "galera", "bicho", "tipo", "né", "aí", "então", "pra caramba"
-- Fale como conversa entre amigos, NÃO como locutor de comercial
-- Varie o comprimento das frases — misture frases curtas e longas
-- O tts_text deve soar 100% natural quando falado em voz alta
+LINGUAGEM: gírias BR naturais ("cara", "mano", "galera", "pra caramba", "demais", "véi", "olha só").
+Fale como quem testou de verdade, NÃO como vendedor. Varie frases curtas e longas.
+O tts_text deve soar 100% natural falado em voz alta — sem emojis, sem pontuação estranha.
 
-COMPLIANCE OBRIGATÓRIO: não afirme nada que não possa ser verificado. Sem especificações inventadas.
+COMPLIANCE: não invente especificações técnicas. Benefícios gerais verificáveis apenas.
 
-Retorne SOMENTE um JSON válido, sem texto adicional, neste formato exato:
+Retorne SOMENTE JSON válido, sem texto adicional:
 {{
-  "seo_title": "título YouTube otimizado para busca com ano 2026, sem #Shorts — ex: 'Mouse Gamer Barato 2026: Vale a Pena MESMO?'",
-  "script_short": "texto completo do roteiro com todas as frases",
-  "tts_text": "mesmo texto limpo para narração em voz alta, sem emojis",
-  "srt": "1\\n00:00:00,000 --> 00:00:03,000\\nFrase gancho\\n\\n2\\n00:00:03,000 --> 00:00:20,000\\nFrases benefícios\\n\\n3\\n00:00:20,000 --> 00:00:30,000\\nFrase CTA",
+  "seo_title": "título YouTube SEO 2026 sem #Shorts — ex: 'Mouse Gamer Custo Benefício 2026: Testei e Esse SURPREENDEU'",
+  "script_short": "roteiro completo com todas as frases, incluindo emojis para o texto de tela",
+  "tts_text": "mesmo roteiro limpo para narração, SEM emojis, SEM markdown, fluido para TTS",
+  "srt": "1\\n00:00:00,000 --> 00:00:03,000\\nGancho viral\\n\\n2\\n00:00:03,000 --> 00:00:10,000\\nBenefício 1\\n\\n3\\n00:00:10,000 --> 00:00:18,000\\nBenefício 2 e 3\\n\\n4\\n00:00:18,000 --> 00:00:25,000\\nProva social\\n\\n5\\n00:00:25,000 --> 00:00:30,000\\nCTA urgente",
   "video_prompts": [
-    "close-up of {topic} with dramatic lighting, cinematic 4K, exciting hook scene",
-    "{topic} being used in action, energetic movement, clean colorful background",
-    "happy person giving thumbs up with {topic}, bright studio, call to action vibe"
+    "extreme close-up of {topic}, dramatic studio lighting, cinematic 4K quality, dark premium background",
+    "{topic} in hands being used, energetic action shot, bright vibrant colors, motion blur",
+    "person reacting positively to {topic}, excited expression, clean minimal background",
+    "{topic} detail shot showing premium quality, golden hour warm light, product photography",
+    "side by side before after comparison, {topic} vs old product, clean white background, bold text"
   ],
-  "thumbnail_prompt": "thumbnail impactante: texto grande e legível + {topic} em destaque, fundo escuro ou vibrante",
-  "image_queries": ["{topic} product photo white background", "{topic} lifestyle action"],
-  "music_style": "eletrônica animada 110–125 BPM sem vocal, energia alta"
+  "thumbnail_prompt": "thumbnail viral: {topic} em destaque com texto impactante, fundo escuro com elementos de cor vibrante",
+  "image_queries": [
+    "{topic} product photo white background professional",
+    "{topic} lifestyle hands-on review",
+    "{topic} close up detail macro shot",
+    "{topic} unboxing premium packaging",
+    "{topic} action shot dynamic",
+    "{topic} dark background dramatic lighting"
+  ],
+  "music_style": "eletrônica animada 115–125 BPM sem vocal, beat drop, energia máxima"
 }}"""
 
 _REQUIRED_FIELDS = [

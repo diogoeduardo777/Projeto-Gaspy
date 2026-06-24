@@ -57,10 +57,63 @@ def _get_google_trends(keywords, geo="BR"):
 
 
 def _get_youtube_results(keyword):
+    """
+    Busca vídeos no YouTube via requests (sem httpx).
+    Extrai títulos e contagem de views do ytInitialData.
+    """
     try:
-        from youtubesearchpython import VideosSearch
-        search = VideosSearch(keyword, limit=5, language="pt", region="BR")
-        return search.result().get("result", [])
+        import json as _json
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/124.0.0.0 Safari/537.36"
+            ),
+            "Accept-Language": "pt-BR,pt;q=0.9",
+        }
+        resp = requests.get(
+            "https://www.youtube.com/results",
+            params={"search_query": keyword},
+            headers=headers,
+            timeout=10,
+        )
+        resp.raise_for_status()
+
+        # Extrai ytInitialData embutido na página
+        match = re.search(r"var ytInitialData\s*=\s*(\{.*?\});</script>", resp.text, re.DOTALL)
+        if not match:
+            return []
+
+        data = _json.loads(match.group(1))
+        contents = (
+            data.get("contents", {})
+            .get("twoColumnSearchResultsRenderer", {})
+            .get("primaryContents", {})
+            .get("sectionListRenderer", {})
+            .get("contents", [])
+        )
+
+        results = []
+        for section in contents:
+            for item in section.get("itemSectionRenderer", {}).get("contents", []):
+                vr = item.get("videoRenderer", {})
+                if not vr:
+                    continue
+                title = "".join(
+                    r.get("text", "") for r in vr.get("title", {}).get("runs", [])
+                )
+                view_text = (
+                    vr.get("viewCountText", {}).get("simpleText", "0")
+                    or vr.get("viewCountText", {}).get("runs", [{}])[0].get("text", "0")
+                )
+                results.append({"title": title, "viewCount": {"short": view_text}})
+                if len(results) >= 5:
+                    break
+            if len(results) >= 5:
+                break
+
+        return results
+
     except Exception as e:
         logger.warning(f"YouTube search falhou para '{keyword}': {e}")
         return []

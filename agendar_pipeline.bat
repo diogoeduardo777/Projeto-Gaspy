@@ -1,0 +1,3 @@
+@echo off
+powershell -Command "& {$action = New-ScheduledTaskAction -Execute 'cmd.exe' -Argument '/c cd /d \"D:\Users\Diogo\Desktop\Gaspy\Gaspy-APBR\shorts-pipeline\" && venv\Scripts\activate.bat && python run.py >> pipeline_scheduler.log 2>&1'; $trigger = New-ScheduledTaskTrigger -Daily -At '18:00'; $settings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit (New-TimeSpan -Hours 2) -StartWhenAvailable -WakeToRun; Register-ScheduledTask -TaskName 'GaspyAPBR-Shorts' -Action $action -Trigger $trigger -Settings $settings -RunLevel Highest -Force; Write-Host 'Agendamento criado: pipeline roda todo dia as 18:00 (horario de pico YouTube Brasil)'}"
+pause

@@ -1,5 +1,6 @@
 import os
 import logging
+from datetime import datetime, timezone, timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -9,6 +10,20 @@ _SCOPES = [
     "https://www.googleapis.com/auth/youtube.force-ssl",
 ]
 _CATEGORY_TECH = "28"
+
+
+def _compute_publish_at_18h_brt():
+    """
+    Calcula o timestamp para publicação às 18h BRT (21h UTC) do dia atual.
+    Se já passou das 18h BRT, agenda para o dia seguinte.
+    """
+    brt = timezone(timedelta(hours=-3))
+    now_brt = datetime.now(timezone.utc).astimezone(brt)
+    target = now_brt.replace(hour=18, minute=0, second=0, microsecond=0)
+    if now_brt >= target:
+        target += timedelta(days=1)
+    utc_target = target.astimezone(timezone.utc)
+    return utc_target.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _get_credentials(credentials_file, token_file):
@@ -36,8 +51,20 @@ def _get_credentials(credentials_file, token_file):
 
         if not creds:
             # Abre o navegador para autorização (só acontece uma vez)
-            flow  = InstalledAppFlow.from_client_secrets_file(credentials_file, _SCOPES)
-            creds = flow.run_local_server(port=0)
+            flow = InstalledAppFlow.from_client_secrets_file(credentials_file, _SCOPES)
+
+            # Força Chrome para evitar bloqueios de VPN/trabalho no Edge
+            import webbrowser
+            _chrome_paths = [
+                r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+                r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+            ]
+            _chrome_exe = next((p for p in _chrome_paths if os.path.exists(p)), None)
+            if _chrome_exe:
+                webbrowser.register("chrome", None, webbrowser.BackgroundBrowser(_chrome_exe))
+                creds = flow.run_local_server(port=0, browser="chrome")
+            else:
+                creds = flow.run_local_server(port=0)
 
         with open(token_file, "w", encoding="utf-8") as f:
             f.write(creds.to_json())
@@ -77,19 +104,31 @@ def upload_video(video_path, title, description, tags, credentials_file,
         ai_disclaimer = "\n\n---\n⚠️ Este vídeo foi criado com auxílio de inteligência artificial."
         full_description = description + ai_disclaimer
 
+        # "scheduled" → agenda publicação automática para 18h BRT do dia corrente
+        if privacy == "scheduled":
+            publish_at = _compute_publish_at_18h_brt()
+            effective_privacy = "private"
+            logger.info(f"Publicação agendada para 18h BRT: {publish_at}")
+        else:
+            publish_at = None
+            effective_privacy = privacy
+
+        status_body = {
+            "privacyStatus":           effective_privacy,
+            "selfDeclaredMadeForKids": False,
+            "containsSyntheticMedia":  True,
+        }
+        if publish_at:
+            status_body["publishAt"] = publish_at
+
         body = {
             "snippet": {
                 "title":       title[:100],
                 "description": full_description[:5000],
-                "tags":        [t[:30] for t in tags[:10]],
+                "tags":        [t[:30] for t in tags[:15]],
                 "categoryId":  _CATEGORY_TECH,
             },
-            "status": {
-                "privacyStatus":           privacy,
-                "selfDeclaredMadeForKids": False,
-                # Disclosure obrigatório YouTube 2024 para conteúdo com IA
-                "containsSyntheticMedia":  True,
-            },
+            "status": status_body,
         }
 
         media   = MediaFileUpload(video_path, mimetype="video/mp4", resumable=True, chunksize=1024 * 1024)
@@ -136,7 +175,8 @@ def upload_thumbnail(video_id, thumbnail_path, credentials_file, token_file="tok
 
 
 def post_affiliate_comment(video_id, amazon_link, shopee_link,
-                           credentials_file, token_file="token.json"):
+                           credentials_file, token_file="token.json",
+                           mercadolivre_link=None):
     """
     Posta comentário com links de afiliado no vídeo.
     O comentário aparece como o dono do canal.
@@ -144,14 +184,16 @@ def post_affiliate_comment(video_id, amazon_link, shopee_link,
     """
     lines = ["🔗 Links mencionados no vídeo:"]
     if amazon_link:
-        lines.append(f"Amazon → {amazon_link}")
+        lines.append(f"🛒 Amazon → {amazon_link}")
     if shopee_link:
-        lines.append(f"Shopee → {shopee_link}")
-    lines.append("\n* Links de afiliado — sem custo adicional para você.")
+        lines.append(f"🛍️ Shopee → {shopee_link}")
+    if mercadolivre_link:
+        lines.append(f"🟡 Mercado Livre → {mercadolivre_link}")
+    lines.append("\n⚠️ Links de afiliado — sem custo adicional para você.")
 
     comment_text = "\n".join(lines)
 
-    if not amazon_link and not shopee_link:
+    if not amazon_link and not shopee_link and not mercadolivre_link:
         logger.warning("Sem links de afiliado configurados — comentário não postado.")
         return False
 

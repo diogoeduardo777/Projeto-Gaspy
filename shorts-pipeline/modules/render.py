@@ -7,26 +7,51 @@ logger = logging.getLogger(__name__)
 
 FPS = 25
 _encoder_cache = None
+_FFMPEG_FALLBACK = r"C:\ffmpeg\bin\ffmpeg.exe"
+
+# 8 Ken Burns directions: zoom-in e zoom-out alternados para dinamismo máximo
+_ZOOM_CONFIGS = [
+    ("min(zoom+0.0018,1.5)", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"),           # in centro
+    ("if(eq(on,1),1.5,max(1,zoom-0.002))", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"),  # out centro
+    ("min(zoom+0.002,1.6)",  "0",                  "0"),                          # in topo-esq
+    ("min(zoom+0.002,1.6)",  "iw-(iw/zoom)",        "ih-(ih/zoom)"),              # in baixo-dir
+    ("if(eq(on,1),1.6,max(1,zoom-0.0022))", "iw-(iw/zoom)", "0"),               # out topo-dir
+    ("min(zoom+0.0015,1.5)", "iw/2-(iw/zoom/2)",   "0"),                         # in topo-centro
+    ("if(eq(on,1),1.5,max(1,zoom-0.0018))", "0",   "ih-(ih/zoom)"),             # out baixo-esq
+    ("min(zoom+0.0015,1.5)", "iw-(iw/zoom)",        "ih/2-(ih/zoom/2)"),         # in direita
+]
+_XFADE_DURATION = 0.25  # segundos de transição dissolve entre cenas
+
+
+def _ffmpeg_exe():
+    """Retorna o executável ffmpeg: PATH primeiro, depois caminho fixo."""
+    return shutil.which("ffmpeg") or _FFMPEG_FALLBACK
 
 
 def _detect_best_encoder():
     """
-    Auto-detecta o melhor encoder H.264 disponível no FFmpeg:
-    AMD AMF (RX 580) > NVIDIA NVENC > CPU libx264 (fallback).
+    Detecta o encoder H.264 a usar:
+    - Se VIDEO_ENCODER=cpu no .env, força libx264 (CPU).
+    - Caso contrário testa AMD AMF e NVENC e cai em libx264 se falharem.
     Resultado é cacheado — a detecção roda só uma vez por sessão.
     """
     global _encoder_cache
     if _encoder_cache:
         return _encoder_cache
+
+    env_encoder = os.getenv("VIDEO_ENCODER", "auto").lower()
+    if env_encoder == "cpu":
+        _encoder_cache = "libx264"
+        logger.info(f"Encoder fixado por VIDEO_ENCODER=cpu: {_encoder_cache}")
+        return _encoder_cache
+
     try:
         result = subprocess.run(
-            ["ffmpeg", "-encoders"],
+            [_ffmpeg_exe(), "-encoders"],
             capture_output=True, text=True, timeout=10
         )
         out = result.stdout
-        if "h264_amf" in out:
-            _encoder_cache = "h264_amf"
-        elif "h264_nvenc" in out:
+        if "h264_nvenc" in out:
             _encoder_cache = "h264_nvenc"
         else:
             _encoder_cache = "libx264"
@@ -49,7 +74,8 @@ def _encoder_flags(encoder):
 
 
 def _check_ffmpeg():
-    if not shutil.which("ffmpeg"):
+    exe = _ffmpeg_exe()
+    if not os.path.isfile(exe) and not shutil.which("ffmpeg"):
         logger.error(
             "FFmpeg não encontrado. Baixe em https://ffmpeg.org e adicione ao PATH do sistema."
         )
@@ -72,45 +98,75 @@ def _escape_srt_path(path):
 def _build_filter_complex(image_paths, srt_path, total_duration, has_music, n_extra_inputs):
     """
     Monta o filtergraph FFmpeg:
-    - Ken Burns (zoompan) em cada imagem
-    - Concat das imagens
+    - Ken Burns 8 direções (zoom-in e zoom-out alternados)
+    - Transições xfade dissolve entre cenas
     - Legendas SRT embutidas
+    - Color grade cinematográfico + vignette
     - Mix de áudio (TTS + música opcional)
     """
     n = len(image_paths)
-    per_img = total_duration / n
+
+    # Ajusta duração por imagem para manter total_duration com o overlap do xfade
+    if n > 1:
+        per_img = (total_duration + (n - 1) * _XFADE_DURATION) / n
+    else:
+        per_img = total_duration
     frames = int(per_img * FPS)
 
     parts = []
 
-    # Ken Burns por imagem
+    # Ken Burns por imagem — 8 direções alternadas incluindo zoom-out
     for i in range(n):
+        z_expr, x_expr, y_expr = _ZOOM_CONFIGS[i % len(_ZOOM_CONFIGS)]
         parts.append(
             f"[{i}:v]"
             f"scale=1920:1920:force_original_aspect_ratio=increase,"
             f"crop=1080:1920,"
-            f"zoompan=z='min(zoom+0.0008,1.3)':d={frames}:"
-            f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,"
-            f"fps={FPS}"
+            f"zoompan=z='{z_expr}':d={frames}:"
+            f"x='{x_expr}':y='{y_expr}':s=1080x1920,"
+            f"fps={FPS},"
+            f"setsar=1"
             f"[v{i}]"
         )
 
-    # Concat de todos os segmentos
-    concat_in = "".join(f"[v{i}]" for i in range(n))
-    parts.append(f"{concat_in}concat=n={n}:v=1:a=0[vcat]")
+    # Encadeia transições xfade dissolve entre cada par de cenas
+    if n == 1:
+        last_label = "v0"
+    else:
+        offset = per_img - _XFADE_DURATION
+        parts.append(
+            f"[v0][v1]xfade=transition=dissolve:"
+            f"duration={_XFADE_DURATION:.2f}:offset={offset:.2f}[xf1]"
+        )
+        last_label = "xf1"
+        for i in range(2, n):
+            offset += per_img - _XFADE_DURATION
+            new_label = f"xf{i}"
+            parts.append(
+                f"[{last_label}][v{i}]xfade=transition=dissolve:"
+                f"duration={_XFADE_DURATION:.2f}:offset={offset:.2f}[{new_label}]"
+            )
+            last_label = new_label
 
-    # Legendas
+    # Legendas + color grade: saturação vibrante, nitidez, vignette cinematográfico
     srt_escaped = _escape_srt_path(srt_path)
     subtitle_style = (
-        "FontName=Arial,FontSize=44,PrimaryColour=&H00FFFFFF,"
-        "OutlineColour=&H00000000,Outline=2,Alignment=2,MarginV=60"
+        "FontName=Arial,FontSize=36,Bold=1,"
+        "PrimaryColour=&H00FFFFFF,"
+        "OutlineColour=&H00000000,"
+        "Outline=2,Shadow=1,"
+        "Alignment=2,MarginV=70"
     )
     parts.append(
-        f"[vcat]subtitles='{srt_escaped}':force_style='{subtitle_style}'[vfinal]"
+        f"[{last_label}]"
+        f"subtitles='{srt_escaped}':force_style='{subtitle_style}',"
+        f"eq=saturation=1.6:contrast=1.1:brightness=0.02,"
+        f"unsharp=5:5:0.6:3:3:0.0,"
+        f"vignette=angle=0.8[vfinal]"
     )
 
     # Áudio
-    tts_idx = n  # índice do input de TTS no comando FFmpeg
+    tts_idx = n  # índice do input TTS no comando FFmpeg
     if has_music:
         music_idx = n + 1
         parts.append(
@@ -148,10 +204,15 @@ def render_video(image_paths, tts_path, srt_path, output_path, music_path=None, 
 
     has_music = bool(music_path and os.path.exists(music_path))
     n_images = len(image_paths)
-    per_img = total_duration / n_images
 
-    # Monta inputs
-    cmd = ["ffmpeg", "-y"]
+    # per_img deve incluir o overlap do xfade — mesma lógica de _build_filter_complex
+    if n_images > 1:
+        per_img = (total_duration + (n_images - 1) * _XFADE_DURATION) / n_images
+    else:
+        per_img = float(total_duration)
+
+    # Monta inputs — cada imagem precisa durar per_img completo para o zoompan
+    cmd = [_ffmpeg_exe(), "-y"]
 
     for img in image_paths:
         cmd += ["-loop", "1", "-t", str(per_img), "-i", img]
@@ -221,7 +282,7 @@ def render_from_clips(clip_paths, tts_path, srt_path, output_path, music_path=No
             f.write(f"file '{clip.replace(chr(39), '')}'\n")
 
     concat_cmd = [
-        "ffmpeg", "-y",
+        _ffmpeg_exe(), "-y",
         "-f", "concat", "-safe", "0",
         "-i", filelist_path,
         "-c", "copy",
@@ -235,21 +296,26 @@ def render_from_clips(clip_paths, tts_path, srt_path, output_path, music_path=No
     # Passo 2: escalar para 1080x1920, adicionar áudio + legendas
     srt_escaped    = _escape_srt_path(srt_path)
     subtitle_style = (
-        "FontName=Arial,FontSize=44,PrimaryColour=&H00FFFFFF,"
-        "OutlineColour=&H00000000,Outline=2,Alignment=2,MarginV=60"
+        "FontName=Arial,FontSize=36,Bold=1,"
+        "PrimaryColour=&H00FFFFFF,"
+        "OutlineColour=&H00000000,"
+        "Outline=2,Shadow=1,"
+        "Alignment=2,MarginV=70"
     )
     has_music = bool(music_path and os.path.exists(music_path))
 
     if has_music:
         filter_complex = (
             f"[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
+            f"eq=saturation=1.5:contrast=1.1:brightness=0.02,unsharp=5:5:0.5:3:3:0.0,"
+            f"vignette=angle=0.8,"
             f"subtitles='{srt_escaped}':force_style='{subtitle_style}'[vfinal];"
             f"[1:a]volume=1.0[tts];"
             f"[2:a]volume=0.12,atrim=0:{total_duration}[bg];"
             f"[tts][bg]amix=inputs=2:duration=first[aout]"
         )
         cmd = [
-            "ffmpeg", "-y",
+            _ffmpeg_exe(), "-y",
             "-i", concat_path, "-i", tts_path, "-i", music_path,
             "-filter_complex", filter_complex,
             "-map", "[vfinal]", "-map", "[aout]",
@@ -257,10 +323,12 @@ def render_from_clips(clip_paths, tts_path, srt_path, output_path, music_path=No
     else:
         filter_complex = (
             f"[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
+            f"eq=saturation=1.5:contrast=1.1:brightness=0.02,unsharp=5:5:0.5:3:3:0.0,"
+            f"vignette=angle=0.8,"
             f"subtitles='{srt_escaped}':force_style='{subtitle_style}'[vfinal]"
         )
         cmd = [
-            "ffmpeg", "-y",
+            _ffmpeg_exe(), "-y",
             "-i", concat_path, "-i", tts_path,
             "-filter_complex", filter_complex,
             "-map", "[vfinal]", "-map", "1:a",

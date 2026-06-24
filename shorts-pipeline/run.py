@@ -10,7 +10,7 @@ from modules.script import generate_script
 from modules.assets import generate_tts, download_images, download_music
 from modules.render import render_video, render_from_clips
 from modules.video_ai import generate_kling_clips
-from modules.publish import generate_amazon_link, generate_shopee_link, save_publish_assets
+from modules.publish import generate_amazon_link, generate_shopee_link, generate_mercadolivre_link, save_publish_assets
 from modules.thumbnail import generate_thumbnail
 from modules.tracker import JobTracker
 from modules.youtube import upload_video, upload_thumbnail, post_affiliate_comment
@@ -121,12 +121,14 @@ def process_topic(topic, tracker):
             total_duration=config.VIDEO_MAX_DURATION,
         )
 
-    # 8. Gerar links de afiliado
+    # 8. Gerar links de afiliado (Amazon + Shopee + Mercado Livre)
     amazon_link = generate_amazon_link(topic["top_keywords"], config.AMAZON_AFFILIATE_TAG)
     shopee_link = generate_shopee_link(topic["top_keywords"], config.SHOPEE_AFFILIATE_ID)
+    ml_link     = generate_mercadolivre_link(topic["top_keywords"], config.MERCADOLIVRE_AFFILIATE_ID)
     save_publish_assets(job_dir, topic["title"], slug, script_data["script_short"],
                         amazon_link, shopee_link, topic["top_keywords"],
-                        telegram_channel=config.TELEGRAM_CHANNEL)
+                        telegram_channel=config.TELEGRAM_CHANNEL,
+                        mercadolivre_link=ml_link)
 
     # 9. Upload automático YouTube (se YOUTUBE_AUTO_UPLOAD=true)
     youtube_id  = None
@@ -153,10 +155,11 @@ def process_topic(topic, tracker):
                 config.YOUTUBE_CREDENTIALS_FILE, config.YOUTUBE_TOKEN_FILE,
             )
 
-            # 9b. Comentário com links de afiliado
+            # 9b. Comentário com links de afiliado (Amazon + Shopee + ML)
             post_affiliate_comment(
                 youtube_id, amazon_link, shopee_link,
                 config.YOUTUBE_CREDENTIALS_FILE, config.YOUTUBE_TOKEN_FILE,
+                mercadolivre_link=ml_link,
             )
 
     # 10. Registrar no SQLite
