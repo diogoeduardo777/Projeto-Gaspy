@@ -151,11 +151,11 @@ def _build_filter_complex(image_paths, srt_path, total_duration, has_music, n_ex
     # Legendas + color grade: saturação vibrante, nitidez, vignette cinematográfico
     srt_escaped = _escape_srt_path(srt_path)
     subtitle_style = (
-        "FontName=Arial,FontSize=36,Bold=1,"
+        "FontName=Arial,FontSize=20,Bold=1,"
         "PrimaryColour=&H00FFFFFF,"
         "OutlineColour=&H00000000,"
         "Outline=2,Shadow=1,"
-        "Alignment=2,MarginV=70"
+        "Alignment=2,MarginV=30"
     )
     parts.append(
         f"[{last_label}]"
@@ -296,11 +296,11 @@ def render_from_clips(clip_paths, tts_path, srt_path, output_path, music_path=No
     # Passo 2: escalar para 1080x1920, adicionar áudio + legendas
     srt_escaped    = _escape_srt_path(srt_path)
     subtitle_style = (
-        "FontName=Arial,FontSize=36,Bold=1,"
+        "FontName=Arial,FontSize=20,Bold=1,"
         "PrimaryColour=&H00FFFFFF,"
         "OutlineColour=&H00000000,"
         "Outline=2,Shadow=1,"
-        "Alignment=2,MarginV=70"
+        "Alignment=2,MarginV=30"
     )
     has_music = bool(music_path and os.path.exists(music_path))
 

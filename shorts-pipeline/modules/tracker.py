@@ -1,6 +1,6 @@
 import sqlite3
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +61,25 @@ class JobTracker:
                     list(fields.values()),
                 )
             conn.commit()
+
+    def get_recent_product_ids(self, days=7):
+        """
+        Retorna conjunto de IDs de produtos (item_id ou ASIN) processados nos últimos `days` dias.
+        Usado para evitar repetir produtos recentes na rotação diária.
+        """
+        cutoff = (datetime.now() - timedelta(days=days)).isoformat()
+        with self._connect() as conn:
+            rows = conn.execute(
+                "SELECT slug FROM jobs WHERE slug LIKE 'product_%' AND created_at >= ?",
+                (cutoff,)
+            ).fetchall()
+        ids = set()
+        for (slug,) in rows:
+            # formato: product_{platform}_{id}_{style}
+            parts = slug.split("_")
+            if len(parts) >= 3:
+                ids.add(parts[2])
+        return ids
 
     def print_summary(self):
         """Imprime resumo dos últimos 20 jobs no log."""

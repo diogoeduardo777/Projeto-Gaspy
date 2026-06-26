@@ -74,6 +74,13 @@ VIDEO_MAX_DURATION = 30
 # Encoder: "auto" detecta automaticamente (AMD AMF > NVENC > CPU)
 VIDEO_ENCODER      = os.getenv("VIDEO_ENCODER", "auto")
 
+# Modo produto — descobre e ranqueia produtos reais da Shopee automaticamente
+# Ative com PRODUCT_MODE=true no .env para usar em vez do modo tópicos
+PRODUCT_MODE              = os.getenv("PRODUCT_MODE", "false").lower() == "true"
+MAX_PRODUCTS_PER_PLATFORM = 4   # top N produtos selecionados por dia
+VIDEOS_PER_PRODUCT        = 1   # 1=só viral (mais variedade diária), 2=viral+ugc
+PRODUCT_KEYWORDS          = SEED_KEYWORDS  # reutiliza keywords do nicho ativo
+
 # Paths
 BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR     = os.path.join(BASE_DIR, "data")

@@ -31,6 +31,77 @@ def generate_tts(text, output_path, voice="pt-BR-FranciscaNeural", rate="+10%"):
         return False
 
 
+def _fmt_srt_time(seconds):
+    h = int(seconds // 3600)
+    m = int((seconds % 3600) // 60)
+    s = int(seconds % 60)
+    ms = int((seconds * 1000) % 1000)
+    return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
+
+
+def _words_to_srt(words, words_per_block=5):
+    if not words:
+        return ""
+    entries = []
+    i = 0
+    while i < len(words):
+        block = words[i:i + words_per_block]
+        start_s = block[0]["offset"] / 10_000_000
+        last = block[-1]
+        end_s = (last["offset"] + last["duration"]) / 10_000_000
+        text = " ".join(w["word"] for w in block)
+        entries.append((start_s, end_s, text))
+        i += words_per_block
+    lines = []
+    for idx, (start, end, text) in enumerate(entries, 1):
+        lines.append(str(idx))
+        lines.append(f"{_fmt_srt_time(start)} --> {_fmt_srt_time(end)}")
+        lines.append(text)
+        lines.append("")
+    return "\n".join(lines)
+
+
+def generate_tts_with_srt(text, audio_path, srt_path, voice="pt-BR-FranciscaNeural", rate="+10%", words_per_block=5):
+    """
+    Gera narração TTS e SRT sincronizado via eventos WordBoundary do Edge-TTS.
+    As legendas mostram exatamente o que está sendo falado, em blocos de words_per_block palavras.
+    """
+    try:
+        import edge_tts
+
+        async def _run():
+            communicate = edge_tts.Communicate(text, voice, rate=rate)
+            words = []
+            audio_chunks = []
+            async for chunk in communicate.stream():
+                if chunk["type"] == "audio":
+                    audio_chunks.append(chunk["data"])
+                elif chunk["type"] == "WordBoundary":
+                    words.append({
+                        "word": chunk["text"],
+                        "offset": chunk["offset"],
+                        "duration": chunk["duration"],
+                    })
+            with open(audio_path, "wb") as f:
+                for data in audio_chunks:
+                    f.write(data)
+            return words
+
+        words = asyncio.run(_run())
+        srt_content = _words_to_srt(words, words_per_block)
+        with open(srt_path, "w", encoding="utf-8") as f:
+            f.write(srt_content)
+        logger.info(f"TTS gerado: {audio_path} | SRT: {srt_path} ({len(words)} palavras)")
+        return True
+
+    except ImportError:
+        logger.error("edge-tts não instalado. Execute: pip install edge-tts")
+        return False
+    except Exception as e:
+        logger.error(f"Erro ao gerar TTS+SRT: {e}")
+        return False
+
+
 def download_images(queries, output_dir, unsplash_key, max_images=12):
     """
     Baixa imagens portrait em alta resolução do Unsplash.
@@ -100,6 +171,31 @@ def download_images(queries, output_dir, unsplash_key, max_images=12):
             logger.error(f"Unsplash API erro para '{query}': {e}")
         except Exception as e:
             logger.error(f"Erro ao baixar imagem '{query}': {e}")
+
+    return downloaded
+
+
+def download_product_images(image_urls, output_dir, max_images=8):
+    """
+    Baixa imagens diretamente de URLs (ex: CDN da Shopee).
+    Retorna lista de paths baixados com sucesso.
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    downloaded = []
+
+    for i, url in enumerate(image_urls[:max_images]):
+        try:
+            resp = requests.get(url, timeout=30, stream=True)
+            resp.raise_for_status()
+            img_path = os.path.join(output_dir, f"product_{i}.jpg")
+            with open(img_path, "wb") as f:
+                for chunk in resp.iter_content(chunk_size=8192):
+                    f.write(chunk)
+            if os.path.getsize(img_path) > 5000:  # ignora arquivos vazios
+                downloaded.append(img_path)
+                logger.info(f"Imagem produto baixada: {img_path}")
+        except Exception as e:
+            logger.warning(f"Falha ao baixar imagem produto {i}: {e}")
 
     return downloaded
 

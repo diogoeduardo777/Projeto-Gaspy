@@ -62,6 +62,7 @@ jobs:
           YOUTUBE_PRIVACY:          ${{ secrets.YOUTUBE_PRIVACY }}
           TELEGRAM_CHANNEL:         ${{ secrets.TELEGRAM_CHANNEL }}
           MERCADOLIVRE_AFFILIATE_ID: ${{ secrets.MERCADOLIVRE_AFFILIATE_ID }}
+          PRODUCT_MODE:              "true"
         run: python run.py
 
       - name: Salvar histórico de jobs (pipeline.db)

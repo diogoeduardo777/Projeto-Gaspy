@@ -53,6 +53,101 @@ Retorne SOMENTE JSON válido, sem texto adicional:
   "music_style": "eletrônica animada 115–125 BPM sem vocal, beat drop, energia máxima"
 }}"""
 
+_PRODUCT_VIRAL_TEMPLATE = """Você é um roteirista VIRAL de YouTube Shorts especializado em e-commerce.
+Crie um roteiro ALTAMENTE ENGAJANTE para um Short de 30 segundos sobre o produto real:
+
+Produto: {name}
+Plataforma: {platform}
+Preço: R$ {price}
+Categoria: {category}
+Avaliação: {rating}/5 ({rating_count} avaliações)
+Vendas: {sold}+
+Descrição do produto: {description}
+
+ESTILO: VIRAL EXPLOSIVO — gancho que choca, números reais que impressionam, CTA urgente.
+
+ESTRUTURA:
+1. GANCHO (0–3s): Use os dados reais para chocar. Ex:
+   - "Esse produto tem {sold} vendas na Shopee e eu nunca tinha ouvido falar"
+   - "R$ {price} por isso? Fiquei em choque quando recebi"
+   - "Todo mundo tá comprando e ninguém tá falando"
+2. BENEFÍCIOS (3–20s): 3 benefícios reais e verificáveis, baseados na descrição. Sem inventar specs.
+3. CTA (20–30s): Urgência + prova social + "link na descrição".
+
+LINGUAGEM: gírias BR naturais, tom de quem testou de verdade, NÃO de vendedor.
+
+Retorne SOMENTE JSON válido:
+{{
+  "seo_title": "título YouTube SEO sem #Shorts — ex: '{name} vale a pena? Testei e SURPREENDEU'",
+  "script_short": "roteiro completo com emojis para texto de tela",
+  "tts_text": "mesmo roteiro SEM emojis, SEM markdown, fluido para narração TTS",
+  "srt": "1\\n00:00:00,000 --> 00:00:03,000\\nGancho\\n\\n2\\n00:00:03,000 --> 00:00:10,000\\nBenefício 1\\n\\n3\\n00:00:10,000 --> 00:00:18,000\\nBenefício 2 e 3\\n\\n4\\n00:00:18,000 --> 00:00:25,000\\nProva social\\n\\n5\\n00:00:25,000 --> 00:00:30,000\\nCTA urgente",
+  "video_prompts": [
+    "extreme close-up of {name}, dramatic studio lighting, cinematic 4K, dark premium background",
+    "{name} product held in hands, energetic shot, vibrant colors, motion",
+    "person reacting positively to {name}, excited expression, clean background",
+    "{name} detail shot premium quality, golden hour light, product photography",
+    "unboxing {name} packaging, satisfying reveal, bright clean background"
+  ],
+  "thumbnail_prompt": "thumbnail viral: {name} em destaque, texto impactante, fundo escuro vibrante",
+  "image_queries": [
+    "{name} product photo white background professional",
+    "{name} lifestyle review hands-on",
+    "{name} close up detail macro",
+    "{name} unboxing packaging",
+    "{name} in use action shot",
+    "{name} dark background dramatic"
+  ],
+  "music_style": "eletrônica animada 115–125 BPM sem vocal, beat drop, energia máxima"
+}}"""
+
+_PRODUCT_UGC_TEMPLATE = """Você é um criador de conteúdo UGC (User Generated Content) autêntico brasileiro.
+Crie um roteiro de YouTube Short de 30 segundos COMO SE FOSSE uma pessoa real
+que acabou de comprar e está usando o produto:
+
+Produto: {name}
+Preço: R$ {price}
+Plataforma: {platform}
+Avaliação: {rating}/5 ({rating_count} avaliações)
+Vendas: {sold}+
+Descrição: {description}
+
+ESTILO: UGC AUTÊNTICO — pessoa real, linguagem casual, mostrando o produto no dia a dia.
+NÃO parece propaganda. Parece recomendação de amigo.
+
+ESTRUTURA:
+1. ABERTURA CASUAL (0–5s): "Olha o que chegou pra mim..." ou "Precisava te mostrar isso"
+2. DEMONSTRAÇÃO (5–20s): Usando/testando o produto, reação genuína, mostra resultado real
+3. RECOMENDAÇÃO (20–30s): "Valeu muito o preço, link na descrição"
+
+LINGUAGEM: casual, gírias BR, tom de conversa, como TikTok de pessoa comum.
+Mencione o preço real (R$ {price}) — preço acessível é prova social forte.
+
+Retorne SOMENTE JSON válido:
+{{
+  "seo_title": "título YouTube SEO sem #Shorts — ex: 'Comprei {name} na {platform} — valeu a pena?'",
+  "script_short": "roteiro completo com emojis para texto de tela",
+  "tts_text": "mesmo roteiro SEM emojis, SEM markdown, fluido para narração TTS",
+  "srt": "1\\n00:00:00,000 --> 00:00:05,000\\nAbertura casual\\n\\n2\\n00:00:05,000 --> 00:00:15,000\\nDemonstração\\n\\n3\\n00:00:15,000 --> 00:00:22,000\\nReação e resultado\\n\\n4\\n00:00:22,000 --> 00:00:30,000\\nRecomendação e CTA",
+  "video_prompts": [
+    "person unboxing {name} at home, natural light, authentic casual feel",
+    "hands holding {name}, testing it, genuine reaction, warm home environment",
+    "{name} in everyday use, person smiling, lifestyle shot, authentic",
+    "close up {name} details, person pointing to features, casual vlog style",
+    "person giving thumbs up with {name}, happy expression, natural light"
+  ],
+  "thumbnail_prompt": "pessoa segurando {name}, expressão surpresa positiva, fundo natural, texto 'VALE A PENA?'",
+  "image_queries": [
+    "{name} product review unboxing",
+    "{name} in use lifestyle photo",
+    "{name} hands on close up",
+    "{name} everyday use home",
+    "{name} user review authentic",
+    "{name} product comparison"
+  ],
+  "music_style": "lo-fi relaxado 90 BPM, vibe casual autêntica, sem vocal"
+}}"""
+
 _REQUIRED_FIELDS = [
     "seo_title", "script_short", "tts_text", "srt",
     "thumbnail_prompt", "image_queries", "music_style", "video_prompts",
@@ -153,6 +248,78 @@ def _generate_ollama(topic, keywords, base_url, model, niche="tecnologia"):
     except Exception as e:
         logger.error(f"Erro inesperado ao gerar roteiro: {e}")
         return None
+
+
+def generate_product_script(product_data, style="viral", provider="ollama",
+                            groq_api_key=None, groq_model=None,
+                            ollama_base_url=None, ollama_model=None):
+    """
+    Gera roteiro focado em produto real.
+    style: "viral" (gancho explosivo) ou "ugc" (pessoa autêntica usando o produto).
+    """
+    template = _PRODUCT_VIRAL_TEMPLATE if style == "viral" else _PRODUCT_UGC_TEMPLATE
+
+    prompt = template.format(
+        name=product_data.get("name", "produto"),
+        platform=product_data.get("platform", "Shopee").capitalize(),
+        price=product_data.get("price", 0),
+        category=product_data.get("category", ""),
+        rating=product_data.get("rating", 0),
+        rating_count=product_data.get("rating_count", 0),
+        sold=product_data.get("sold", 0),
+        description=product_data.get("description", ""),
+    )
+
+    topic_label = f"{product_data.get('name', 'produto')} [{style}]"
+    logger.info(f"Gerando roteiro de produto [{provider.upper()}]: {topic_label}")
+
+    if provider == "groq":
+        if not groq_api_key:
+            logger.error("GROQ_API_KEY não configurado.")
+            return None
+        try:
+            from groq import Groq
+            client = Groq(api_key=groq_api_key)
+            completion = client.chat.completions.create(
+                model=groq_model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.75,
+                max_tokens=1024,
+            )
+            raw = completion.choices[0].message.content
+            data = _extract_json(raw)
+            if not data:
+                logger.error(f"Groq não retornou JSON válido para produto '{topic_label}'")
+                return None
+            return _validate_fields(data, topic_label)
+        except Exception as e:
+            logger.error(f"Erro Groq (produto): {e}")
+            return None
+    else:
+        try:
+            response = requests.post(
+                f"{ollama_base_url}/api/generate",
+                json={
+                    "model": ollama_model,
+                    "prompt": prompt,
+                    "stream": False,
+                    "options": {"temperature": 0.75, "top_p": 0.9},
+                },
+                timeout=120,
+            )
+            response.raise_for_status()
+            raw = response.json().get("response", "")
+            data = _extract_json(raw)
+            if not data:
+                logger.error(f"Ollama não retornou JSON válido para produto '{topic_label}'")
+                return None
+            return _validate_fields(data, topic_label)
+        except requests.exceptions.ConnectionError:
+            logger.error("Ollama não está rodando. Execute: ollama serve")
+            return None
+        except Exception as e:
+            logger.error(f"Erro inesperado ao gerar roteiro de produto: {e}")
+            return None
 
 
 def generate_script(topic, keywords, provider="ollama",
