@@ -68,6 +68,7 @@ jobs:
         run: python run.py
 
       - name: Salvar histórico de jobs (pipeline.db)
+        if: always()   # salva o histórico mesmo quando o pipeline falha (0 vídeos)
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name  "github-actions[bot]"

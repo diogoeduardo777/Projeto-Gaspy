@@ -464,10 +464,11 @@ def main():
     _ensure_dirs()
 
     tracker = JobTracker(config.DB_PATH)
+    success = 0
 
     if config.PRODUCT_MODE:
         logger.info("Modo: PRODUTO (Shopee/Amazon — produtos reais)")
-        run_product_mode(tracker)
+        success = run_product_mode(tracker)
     else:
         # Modo padrão: tópicos em alta (comportamento original)
         logger.info("Modo: TÓPICOS (Google Trends + YouTube)")
@@ -485,6 +486,12 @@ def main():
         logger.info(f"Vídeos em: {config.JOBS_DIR}")
 
     tracker.print_summary()
+
+    # 0 vídeos gerados = falha real — exit 1 faz o GitHub Actions ficar vermelho
+    # e disparar notificação, em vez de falhar em silêncio com status verde
+    if success == 0:
+        logger.error("Nenhum vídeo foi gerado nesta execução — saindo com erro.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
