@@ -1,9 +1,45 @@
 import json
 import re
+import time
 import logging
 import requests
 
 logger = logging.getLogger(__name__)
+
+# Retry Groq: 3 tentativas no modelo principal (backoff 2s/4s) + 1 no modelo fallback.
+# Cobre quedas de rede transitórias que antes perdiam o dia inteiro de vídeos.
+_GROQ_FALLBACK_MODEL = "llama-3.1-8b-instant"
+
+
+def _groq_completion_with_retry(client, model, prompt, temperature, max_tokens):
+    """
+    Chama a Groq com retry exponencial. Se o modelo principal esgotar as
+    tentativas, tenta uma última vez com o modelo fallback (mais leve).
+    Retorna o texto da resposta ou None.
+    """
+    attempts = [(model, 0), (model, 2), (model, 4)]
+    if model != _GROQ_FALLBACK_MODEL:
+        attempts.append((_GROQ_FALLBACK_MODEL, 8))
+
+    last_err = None
+    for attempt_model, delay in attempts:
+        if delay:
+            logger.warning(f"Groq: aguardando {delay}s antes de tentar novamente ({attempt_model})...")
+            time.sleep(delay)
+        try:
+            completion = client.chat.completions.create(
+                model=attempt_model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+            return completion.choices[0].message.content
+        except Exception as e:
+            last_err = e
+            logger.warning(f"Groq falhou ({attempt_model}): {e}")
+
+    logger.error(f"Groq esgotou todas as tentativas: {last_err}")
+    return None
 
 _PROMPT_TEMPLATE = """Você é um roteirista VIRAL de YouTube Shorts — especialista em fazer o dedo parar de rolar.
 Crie um roteiro ALTAMENTE ENGAJANTE para um Short de 30 segundos sobre: "{topic}".
@@ -193,13 +229,9 @@ def _generate_groq(topic, keywords, api_key, model, niche="tecnologia"):
 
     try:
         client = Groq(api_key=api_key)
-        completion = client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.7,
-            max_tokens=1024,
-        )
-        raw = completion.choices[0].message.content
+        raw = _groq_completion_with_retry(client, model, prompt, temperature=0.7, max_tokens=1024)
+        if raw is None:
+            return None
         data = _extract_json(raw)
 
         if not data:
@@ -280,13 +312,9 @@ def generate_product_script(product_data, style="viral", provider="ollama",
         try:
             from groq import Groq
             client = Groq(api_key=groq_api_key)
-            completion = client.chat.completions.create(
-                model=groq_model,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.75,
-                max_tokens=1024,
-            )
-            raw = completion.choices[0].message.content
+            raw = _groq_completion_with_retry(client, groq_model, prompt, temperature=0.75, max_tokens=1024)
+            if raw is None:
+                return None
             data = _extract_json(raw)
             if not data:
                 logger.error(f"Groq não retornou JSON válido para produto '{topic_label}'")

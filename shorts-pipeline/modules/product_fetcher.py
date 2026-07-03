@@ -132,17 +132,42 @@ def search_shopee_trending(keyword, limit=10):
     return []
 
 
-def fetch_shopee_product_detail(item_id, shop_id):
+def _validate_image_urls(urls):
+    """
+    Filtra a lista de imagens do products.json mantendo apenas URLs http(s)
+    válidas — evita que entradas erradas quebrem o download depois.
+    """
+    if not isinstance(urls, list):
+        return []
+    valid = []
+    for u in urls:
+        if isinstance(u, str) and u.strip().lower().startswith(("http://", "https://")):
+            valid.append(u.strip())
+        elif u:
+            logger.warning(f"URL de imagem inválida ignorada no products.json: {str(u)[:80]}")
+    return valid
+
+
+def fetch_shopee_product_detail(item_id, shop_id, max_retries=2):
     """Busca detalhes completos (imagens, categoria, descrição) de um produto Shopee."""
     sess = _get_session()
     try:
         product_referer = f"https://shopee.com.br/produto-i.{shop_id}.{item_id}"
-        resp = sess.get(
-            _SHOPEE_DETAIL_URL,
-            params={"itemid": item_id, "shopid": shop_id},
-            headers={"Referer": product_referer},
-            timeout=15,
-        )
+        resp = None
+        for attempt in range(max_retries):
+            try:
+                resp = sess.get(
+                    _SHOPEE_DETAIL_URL,
+                    params={"itemid": item_id, "shopid": shop_id},
+                    headers={"Referer": product_referer},
+                    timeout=15,
+                )
+                break
+            except requests.RequestException as e:
+                if attempt + 1 >= max_retries:
+                    raise
+                logger.warning(f"Shopee detail erro de rede ({item_id}): {e} — retry em 2s...")
+                time.sleep(2)
         if resp.status_code == 403:
             logger.warning(f"Shopee detail bloqueado para {item_id}")
             return None
@@ -262,7 +287,7 @@ def load_manual_products(filepath):
                     "sold":         int(entry.get("sold", 0)),
                     "description":  entry.get("description", ""),
                     "category":     entry.get("category", ""),
-                    "images":       entry.get("images", []),
+                    "images":       _validate_image_urls(entry.get("images", [])),
                 }
                 # Tenta buscar imagens via API se não fornecidas
                 if not product["images"] and shop_id and item_id:
@@ -298,7 +323,7 @@ def load_manual_products(filepath):
                     "sold":         int(entry.get("sold", 0)),
                     "description":  entry.get("description", ""),
                     "category":     entry.get("category", ""),
-                    "images":       entry.get("images", []),
+                    "images":       _validate_image_urls(entry.get("images", [])),
                 }
             else:
                 product = parse_amazon_url(url)

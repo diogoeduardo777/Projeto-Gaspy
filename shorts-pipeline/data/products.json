@@ -3,100 +3,380 @@
     "platform": "shopee",
     "product_url": "https://shopee.com.br/Mouse-gamer-Redragon-Cobra-M711-RGB-i.448637517.12488254893",
     "name": "Mouse Gamer Redragon Cobra M711 RGB",
-    "price": 99.90,
+    "price": 99.9,
     "rating": 4.8,
     "rating_count": 12500,
     "sold": 45000,
     "description": "Mouse gamer com fio USB e iluminação RGB Chroma, sensor óptico de 10.000 DPI ajustável, 7 botões programáveis, cabo trançado anti-entrelaçamento e design ergonômico. Um dos mouses mais vendidos do Brasil para jogos FPS e competitivo.",
     "category": "Mouse Gamer",
-    "images": []
+    "images": [
+      "https://m.media-amazon.com/images/I/71qVXkhnvmL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61FnLJfIU6L._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71GJEwIwFsL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71ZCpg9dyrL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/81JfNGn72bL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/715IxjcJv7L._AC_SL1500_.jpg"
+    ]
   },
   {
     "platform": "shopee",
     "product_url": "https://shopee.com.br/Teclado-Gamer-Kumara-K552W-Branco-Outemu-Red-Redragon-i.372607719.9714894607",
     "name": "Teclado Gamer Mecânico Redragon Kumara K552",
-    "price": 129.90,
+    "price": 129.9,
     "rating": 4.7,
     "rating_count": 8900,
     "sold": 32000,
     "description": "Teclado gamer mecânico compacto TKL com switches Outemu Red, iluminação RGB por tecla, construção em metal, anti-ghosting completo e layout ABNT2 em português. Ideal para quem quer entrar no mundo dos mecânicos gastando pouco.",
     "category": "Teclado Gamer",
-    "images": []
+    "images": [
+      "https://m.media-amazon.com/images/I/61lS3KU7mkL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61+J3sskSxL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61EdpDQQDXL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61P8Mw8j3OL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61h1eKdkeML._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61xirVGkrtL._AC_SL1500_.jpg"
+    ]
   },
   {
     "platform": "shopee",
     "product_url": "https://shopee.com.br/Carregador-Super-R%C3%A1pido-Turbo-125w-Fonte-Tipo-C-para-celular-50w-68w-168w-i.638380156.22393096204",
     "name": "Carregador Turbo 125W Super Rápido USB-C",
-    "price": 49.90,
+    "price": 49.9,
     "rating": 4.7,
     "rating_count": 5200,
     "sold": 28000,
     "description": "Carregador turbo 125W ultra-rápido com entrada USB-C, compatível com celulares Android e iPhone. Carrega de 0 a 50% em menos de 20 minutos. Proteção contra sobrecarga, superaquecimento e curto-circuito.",
     "category": "Carregador",
-    "images": []
+    "images": [
+      "https://m.media-amazon.com/images/I/314kb6rpL-L._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/31P72sv179L._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/31o9L06+YrL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/31sbuKXn8xL._AC_SL1500_.jpg"
+    ]
   },
   {
     "platform": "shopee",
     "product_url": "https://shopee.com.br/Hub-Adaptador-7-portas-USB-2.0-USB-3.0-Hub-Tipo-C-7-Em-1-Usb-3.0-Usb-c-Entrada-USB-C-Alex-i.478697224.23298752475",
     "name": "Hub USB 7 em 1 Tipo C USB 3.0",
-    "price": 59.90,
+    "price": 59.9,
     "rating": 4.6,
     "rating_count": 3800,
     "sold": 19000,
     "description": "Hub adaptador 7 em 1 com entrada USB-C, 3 portas USB 3.0, USB 2.0 e compatível com notebooks, MacBooks e tablets. Expande as conexões do seu computador sem perder velocidade de transferência. Compacto e plug-and-play.",
     "category": "Acessório",
-    "images": []
+    "images": [
+      "https://m.media-amazon.com/images/I/616WOsQwk-L._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71QvEcjadwL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/41v1LU3F-fL._AC_SL1200_.jpg",
+      "https://m.media-amazon.com/images/I/51+P+RKkTcL._AC_SL1194_.jpg",
+      "https://m.media-amazon.com/images/I/71IAykjobuL._AC_SL1200_.jpg"
+    ]
   },
   {
     "platform": "amazon",
     "product_url": "https://www.amazon.com.br/Ouvido-Headset-Fuxi-H3-Wireless-Bluetooth/dp/B0CHJXCJTW",
     "affiliate_link": "https://www.amazon.com.br/dp/B0CHJXCJTW?tag=amazonbras09-20",
     "name": "Havit Headset Gamer Fuxi-H3 Sem Fio",
-    "price": 139.90,
+    "price": 139.9,
     "rating": 4.6,
     "rating_count": 4700,
     "sold": 5000,
     "description": "Headset gamer sem fio com 4 modos de conexão: Wireless 2.4GHz, Bluetooth, USB-C e cabo 3.5mm. Som surround 7.1, driver de 40mm, microfone destacável com cancelamento de ruído e bateria de até 26 horas. Escolha da Amazon com mais de 5 mil vendas no último mês.",
     "category": "Headset Gamer",
-    "images": []
+    "images": [
+      "https://m.media-amazon.com/images/I/71g1gS6qGmL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61Hm8RrcL6L._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71XojD80QQL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71PZ6U1SoeL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/815tWJTJbVL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71hc+JWGRSL._AC_SL1500_.jpg"
+    ]
   },
   {
     "platform": "amazon",
     "product_url": "https://www.amazon.com.br/Logitech-Bluetooth-Silencioso-Ambidestro-Compat%C3%ADvel/dp/B0DTJKLBBQ",
     "affiliate_link": "https://www.amazon.com.br/dp/B0DTJKLBBQ?tag=amazonbras09-20",
     "name": "Mouse Sem Fio Logitech M240 Silent Bluetooth",
-    "price": 89.90,
+    "price": 89.9,
     "rating": 4.5,
     "rating_count": 2100,
     "sold": 3500,
     "description": "Mouse sem fio Bluetooth ultrassilencioso com 90% de redução no barulho do clique, bateria de 18 meses, design ambidestro compacto e compatível com Windows, macOS e ChromeOS. Perfeito para trabalho, estudo e uso no dia a dia.",
     "category": "Mouse Sem Fio",
-    "images": []
+    "images": [
+      "https://m.media-amazon.com/images/I/61tTn6rJ3zL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/51+zmcWK3cL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61RdrJgneSL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61HXD8JfNrL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/51laF-BN4zL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61fdhFeFLtL._AC_SL1500_.jpg"
+    ]
   },
   {
     "platform": "amazon",
     "product_url": "https://www.amazon.com.br/C%C3%A2mera-webcam-Logitech-Webcams-Equipamentos/dp/B07K986YLL",
     "affiliate_link": "https://www.amazon.com.br/dp/B07K986YLL?tag=amazonbras09-20",
     "name": "Webcam Full HD Logitech C920s 1080p",
-    "price": 399.90,
+    "price": 399.9,
     "rating": 4.7,
     "rating_count": 9200,
     "sold": 4200,
     "description": "Webcam Full HD 1080p 30fps com microfone duplo embutido, tampa de privacidade, correção automática de luz e compatível com Zoom, Teams e Meet. A webcam mais vendida do mundo para home office, aulas online e streaming.",
     "category": "Webcam",
-    "images": []
+    "images": [
+      "https://m.media-amazon.com/images/I/71mH9oO2WKL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61-6uAf8soL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/611J48bk4KL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61LXx0GcbmL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61MrHDWfiIL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/613xnaHUTBL._AC_SL1500_.jpg"
+    ]
   },
   {
     "platform": "amazon",
     "product_url": "https://www.amazon.com.br/Logitech-Silencioso-Ambidestro-Conex%C3%A3o-Bluetooth/dp/B0CJ3BDN7T",
     "affiliate_link": "https://www.amazon.com.br/dp/B0CJ3BDN7T?tag=amazonbras09-20",
     "name": "Mouse Sem Fio Logitech Pebble 2 M350s",
-    "price": 119.90,
+    "price": 119.9,
     "rating": 4.6,
     "rating_count": 3100,
     "sold": 4800,
     "description": "Mouse sem fio ultrafino e silencioso com Bluetooth e receptor USB-C, design slim ambidestro, bateria de 24 meses, clique 90% mais silencioso e compatível com Windows, macOS, iPad e ChromeOS. Elegante e discreto para qualquer ambiente.",
     "category": "Mouse Sem Fio",
-    "images": []
+    "images": [
+      "https://m.media-amazon.com/images/I/61mrwx7vvsL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71a2xCpa9rL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61ZCNKFmo-L._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71mBwbapTSL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/81lBWmYloSL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/91NXInSmd+L._AC_SL1500_.jpg"
+    ]
+  },
+  {
+    "platform": "amazon",
+    "product_url": "https://www.amazon.com.br/dp/B0DVMQVVDY",
+    "affiliate_link": "https://www.amazon.com.br/dp/B0DVMQVVDY?tag=amazonbras09-20",
+    "name": "Philips Fone de Ouvido Sem Fio TWS TAT1109 Bluetooth",
+    "price": 98.23,
+    "rating": 4.6,
+    "rating_count": 7034,
+    "sold": 3000,
+    "description": "Fone TWS da Philips com conexão Bluetooth estável e até 24 horas de bateria no total (6h nos fones + 18h no estojo com carregamento rápido USB-C). Tem resistência IPX4 contra suor e respingos e microfone com redução de ruído para chamadas mais nítidas. Ótimo custo-benefício para o dia a dia e treinos.",
+    "category": "Fone Bluetooth TWS",
+    "images": [
+      "https://m.media-amazon.com/images/I/519bjoeFBTL._AC_SL1000_.jpg",
+      "https://m.media-amazon.com/images/I/71fUtCVpZbL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61Km8J7tTtL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/51320dTHdxL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/51OM7LglUrL._AC_SL1500_.jpg"
+    ]
+  },
+  {
+    "platform": "amazon",
+    "product_url": "https://www.amazon.com.br/dp/B0DB52X2ZW",
+    "affiliate_link": "https://www.amazon.com.br/dp/B0DB52X2ZW?tag=amazonbras09-20",
+    "name": "Xiaomi Redmi Buds 6 Play Fone Bluetooth TWS",
+    "price": 91.9,
+    "rating": 4.6,
+    "rating_count": 1789,
+    "sold": 2000,
+    "description": "Fone bluetooth TWS da Xiaomi com driver dinâmico de 10 mm, redução de ruído com IA nas chamadas e Bluetooth 5.4. A bateria chega a até 36 horas de uso com o estojo de carregamento e o controle é feito por toque. Um dos fones baratos mais vendidos da Amazon Brasil.",
+    "category": "Fone Bluetooth TWS",
+    "images": [
+      "https://m.media-amazon.com/images/I/51DVGGv77KL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61jfsv169GL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61NYjQVY-SL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61YrxRWrxyL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61dp4dsBArL._AC_SL1500_.jpg"
+    ]
+  },
+  {
+    "platform": "amazon",
+    "product_url": "https://www.amazon.com.br/dp/B0CX5C6WP3",
+    "affiliate_link": "https://www.amazon.com.br/dp/B0CX5C6WP3?tag=amazonbras09-20",
+    "name": "JBL Caixa de Som Go 4 Bluetooth Portátil à Prova D'água",
+    "price": 208.59,
+    "rating": 4.9,
+    "rating_count": 10484,
+    "sold": 1000,
+    "description": "Caixinha portátil com o som JBL Pro, graves potentes e design compacto que cabe na palma da mão. Bateria de até 7 horas (com mais 2 horas extras via Playtime Boost) e certificação IP67 à prova d'água e poeira. Ainda permite parear duas Go 4 em estéreo ou conectar várias caixas via Auracast.",
+    "category": "Caixa de Som Bluetooth",
+    "images": [
+      "https://m.media-amazon.com/images/I/71HdLDJEEUL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/91xaR6hhe3L._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/91KLbNK9ppL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/91u8BIzloSL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71TnzyHkbXL._AC_SL1500_.jpg"
+    ]
+  },
+  {
+    "platform": "amazon",
+    "product_url": "https://www.amazon.com.br/dp/B0CVCLGV1W",
+    "affiliate_link": "https://www.amazon.com.br/dp/B0CVCLGV1W?tag=amazonbras09-20",
+    "name": "Smartwatch Samsung Galaxy Fit3 Display 1.6 Grafite",
+    "price": 201.04,
+    "rating": 4.7,
+    "rating_count": 11734,
+    "sold": 5000,
+    "description": "Pulseira inteligente da Samsung com tela de 1,6 polegadas para acompanhar atividades físicas e dados de saúde no dia a dia. Sincroniza com a conta Samsung e armazena seus dados de saúde com segurança na Samsung Cloud. Best-seller de smartwatches na Amazon Brasil, com mais de 11 mil avaliações.",
+    "category": "Smartwatch",
+    "images": [
+      "https://m.media-amazon.com/images/I/51bjAlTBzZL._AC_SL1000_.jpg",
+      "https://m.media-amazon.com/images/I/51PDb6meDaL._AC_SL1000_.jpg",
+      "https://m.media-amazon.com/images/I/61iDPAYyN8L._AC_SL1000_.jpg",
+      "https://m.media-amazon.com/images/I/618XpoF1MBL._AC_SL1000_.jpg",
+      "https://m.media-amazon.com/images/I/61FzO3l2yeL._AC_SL1000_.jpg"
+    ]
+  },
+  {
+    "platform": "amazon",
+    "product_url": "https://www.amazon.com.br/dp/B0DWFQCY3V",
+    "affiliate_link": "https://www.amazon.com.br/dp/B0DWFQCY3V?tag=amazonbras09-20",
+    "name": "Huawei Band 10 Smartwatch Análise do Sono Profissional",
+    "price": 181.8,
+    "rating": 4.8,
+    "rating_count": 5110,
+    "sold": 500,
+    "description": "Smartband ultrafina (8,99 mm) e ultraleve (15 g) da Huawei, confortável para usar o dia inteiro. Oferece análise do sono em nível profissional, monitoramento de frequência cardíaca e assistente de bem-estar emocional. Compatível com Android e iOS.",
+    "category": "Smartwatch",
+    "images": [
+      "https://m.media-amazon.com/images/I/619yH8oZ2EL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71zizvsmtnL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/91S4-9B2-iL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71LMDnypjDL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/81asQV0I2LL._AC_SL1500_.jpg"
+    ]
+  },
+  {
+    "platform": "amazon",
+    "product_url": "https://www.amazon.com.br/dp/B0BMFQP2ZZ",
+    "affiliate_link": "https://www.amazon.com.br/dp/B0BMFQP2ZZ?tag=amazonbras09-20",
+    "name": "Fifine AM8 Microfone Dinâmico USB XLR para Podcast e Streaming",
+    "price": 306.54,
+    "rating": 4.8,
+    "rating_count": 11214,
+    "sold": 300,
+    "description": "Microfone dinâmico da FIFINE com conexão dupla USB e XLR, ideal para podcast, streaming, jogos e gravação de voz. Vem com iluminação RGB, botão de mudo por toque, saída para fone de ouvido e suporte de mesa incluído. Um dos microfones mais vendidos da Amazon Brasil, com mais de 11 mil avaliações.",
+    "category": "Microfone",
+    "images": [
+      "https://m.media-amazon.com/images/I/71k6li+9vFL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71-Q2FWa-ZL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71B14iOx5QL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/719zgeEHDdL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71F3tnbWnpL._AC_SL1500_.jpg"
+    ]
+  },
+  {
+    "platform": "amazon",
+    "product_url": "https://www.amazon.com.br/dp/B00BX5FOCK",
+    "affiliate_link": "https://www.amazon.com.br/dp/B00BX5FOCK?tag=amazonbras09-20",
+    "name": "Pen Drive SanDisk Cruzer Blade 64GB USB",
+    "price": 64.99,
+    "rating": 4.8,
+    "rating_count": 60590,
+    "sold": 100,
+    "description": "Pendrive clássico da SanDisk com 64 GB de armazenamento e conexão USB 2.0 plug and play, sem precisar instalar nada. Design ultracompacto que cabe no bolso ou chaveiro, compatível com Windows, macOS, Linux, Smart TVs e som automotivo. Mais de 60 mil avaliações na Amazon Brasil.",
+    "category": "Pendrive",
+    "images": [
+      "https://m.media-amazon.com/images/I/61ERDR3tATL._AC_SL1400_.jpg",
+      "https://m.media-amazon.com/images/I/61mcOyUlsTL._AC_SL1400_.jpg",
+      "https://m.media-amazon.com/images/I/61bKsMIk0NL._AC_SL1400_.jpg",
+      "https://m.media-amazon.com/images/I/51m7WZy9qaL._AC_SL1000_.jpg"
+    ]
+  },
+  {
+    "platform": "amazon",
+    "product_url": "https://www.amazon.com.br/dp/B0C9QSV82F",
+    "affiliate_link": "https://www.amazon.com.br/dp/B0C9QSV82F?tag=amazonbras09-20",
+    "name": "Geonav Power Bank 10000mAh por Indução MagSafe",
+    "price": 139.9,
+    "rating": 4.5,
+    "rating_count": 4358,
+    "sold": 1000,
+    "description": "Power bank de 10.000 mAh com três modos de carregamento: sem fio por indução (padrão Qi e compatível com MagSafe do iPhone 12 ao 15), USB-C Power Delivery 20W e USB-A Quick Charge 18W. Carrega dois dispositivos ao mesmo tempo e o suporte dobrável permite usar o celular como em um pedestal enquanto carrega.",
+    "category": "Power Bank",
+    "images": [
+      "https://m.media-amazon.com/images/I/615U7klnYVL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61tfAz5xQxL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71XUZsiSE5L._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71UpQ5My-kL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71Tm9KenLWL._AC_SL1500_.jpg"
+    ]
+  },
+  {
+    "platform": "amazon",
+    "product_url": "https://www.amazon.com.br/dp/B0152HPXXE",
+    "affiliate_link": "https://www.amazon.com.br/dp/B0152HPXXE?tag=amazonbras09-20",
+    "name": "Mouse Pad Gamer Havit HV-MP830 Extra Grande 90x30cm",
+    "price": 24.98,
+    "rating": 4.8,
+    "rating_count": 32292,
+    "sold": 1000,
+    "description": "Mousepad gamer extra grande (90 x 30 cm) da Havit, o mais vendido da categoria na Amazon Brasil com mais de 32 mil avaliações. Superfície em tecido de malha fina com revestimento à prova d'água e base de borracha antiderrapante. Cobre teclado e mouse, deixando o setup mais bonito e preciso.",
+    "category": "Mousepad Gamer",
+    "images": [
+      "https://m.media-amazon.com/images/I/31VsRBgen0L._AC_SL1200_.jpg",
+      "https://m.media-amazon.com/images/I/918zoZoGR2L._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/51rTx0ADobL._AC_SL1200_.jpg",
+      "https://m.media-amazon.com/images/I/61GhCwQKl6L._AC_SL1200_.jpg",
+      "https://m.media-amazon.com/images/I/61MhYxENO+L._AC_SL1200_.jpg"
+    ]
+  },
+  {
+    "platform": "amazon",
+    "product_url": "https://www.amazon.com.br/dp/B0F9B4TQVP",
+    "affiliate_link": "https://www.amazon.com.br/dp/B0F9B4TQVP?tag=amazonbras09-20",
+    "name": "Suporte Para Notebook Com Cooler Duplo 8 Níveis de Ajuste",
+    "price": 47.4,
+    "rating": 4.7,
+    "rating_count": 605,
+    "sold": 500,
+    "description": "Suporte ergonômico ultrafino (3 cm) para notebooks de até 17 polegadas, com 8 posições de inclinação para melhorar a postura. Traz dois ventiladores de refrigeração silenciosos que ajudam a evitar superaquecimento e ainda tem porta USB adicional para conectar periféricos. Ideal para home office e setup gamer.",
+    "category": "Suporte de Notebook",
+    "images": [
+      "https://m.media-amazon.com/images/I/61sWhcvub6L._AC_SL1024_.jpg",
+      "https://m.media-amazon.com/images/I/71y8lAyfduL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61RRLSliy7L._AC_SL1200_.jpg",
+      "https://m.media-amazon.com/images/I/61Ouz3fj-4L._AC_SL1200_.jpg",
+      "https://m.media-amazon.com/images/I/61sMwMJuDFL._AC_SL1200_.jpg"
+    ]
+  },
+  {
+    "platform": "amazon",
+    "product_url": "https://www.amazon.com.br/dp/B074L9L5KZ",
+    "affiliate_link": "https://www.amazon.com.br/dp/B074L9L5KZ?tag=amazonbras09-20",
+    "name": "Mouse Sem Fio Logitech M170 Ambidestro Compacto",
+    "price": 45.29,
+    "rating": 4.8,
+    "rating_count": 69505,
+    "sold": 2000,
+    "description": "Mouse sem fio 2,4 GHz da Logitech com receptor USB plug-and-play: é só conectar e usar. Design ambidestro compacto, fácil de levar na bolsa, com bateria que dura até 12 meses graças ao modo de suspensão automática. Campeão de vendas com quase 70 mil avaliações na Amazon Brasil.",
+    "category": "Mouse Sem Fio",
+    "images": [
+      "https://m.media-amazon.com/images/I/51+TpH1VS8L._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71jnabfMTaL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71hhxfW0GRL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71fTt2Hjs4L._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61hYhdfT1QL._AC_SL1500_.jpg"
+    ]
+  },
+  {
+    "platform": "amazon",
+    "product_url": "https://www.amazon.com.br/dp/B09B8VGCR8",
+    "affiliate_link": "https://www.amazon.com.br/dp/B09B8VGCR8?tag=amazonbras09-20",
+    "name": "Echo Dot Smart Speaker com Alexa",
+    "price": 309.0,
+    "rating": 4.8,
+    "rating_count": 90225,
+    "sold": 3000,
+    "description": "O smart speaker mais vendido da Amazon, com Alexa em português e som vibrante com vocais nítidos e graves potentes. Toca músicas e podcasts do Spotify, Amazon Music e outros via Wi-Fi ou Bluetooth, responde perguntas, cria timers e controla dispositivos de casa inteligente por voz. Mais de 90 mil avaliações com nota 4,8.",
+    "category": "Smart Speaker",
+    "images": [
+      "https://m.media-amazon.com/images/I/61evEYmxBZL._AC_SL1000_.jpg",
+      "https://m.media-amazon.com/images/I/71xoR4A6q-L._AC_SL1000_.jpg",
+      "https://m.media-amazon.com/images/I/51IeRbtI59L._AC_SL1200_.jpg",
+      "https://m.media-amazon.com/images/I/71SzQ3-PA0L._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/51EkhvTiC+L._AC_SL1000_.jpg"
+    ]
   }
 ]

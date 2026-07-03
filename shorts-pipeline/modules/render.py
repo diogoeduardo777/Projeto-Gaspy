@@ -149,17 +149,22 @@ def _build_filter_complex(image_paths, srt_path, total_duration, has_music, n_ex
             last_label = new_label
 
     # Legendas + color grade: saturação vibrante, nitidez, vignette cinematográfico
-    srt_escaped = _escape_srt_path(srt_path)
-    subtitle_style = (
-        "FontName=Arial,FontSize=20,Bold=1,"
-        "PrimaryColour=&H00FFFFFF,"
-        "OutlineColour=&H00000000,"
-        "Outline=2,Shadow=1,"
-        "Alignment=2,MarginV=30"
-    )
+    # srt_path=None → renderiza sem legendas (SRT ausente/vazio não derruba o vídeo)
+    if srt_path:
+        srt_escaped = _escape_srt_path(srt_path)
+        subtitle_style = (
+            "FontName=Arial,FontSize=20,Bold=1,"
+            "PrimaryColour=&H00FFFFFF,"
+            "OutlineColour=&H00000000,"
+            "Outline=2,Shadow=1,"
+            "Alignment=2,MarginV=30"
+        )
+        subtitle_filter = f"subtitles='{srt_escaped}':force_style='{subtitle_style}',"
+    else:
+        subtitle_filter = ""
     parts.append(
         f"[{last_label}]"
-        f"subtitles='{srt_escaped}':force_style='{subtitle_style}',"
+        f"{subtitle_filter}"
         f"eq=saturation=1.6:contrast=1.1:brightness=0.02,"
         f"unsharp=5:5:0.6:3:3:0.0,"
         f"vignette=angle=0.8[vfinal]"
@@ -198,9 +203,10 @@ def render_video(image_paths, tts_path, srt_path, output_path, music_path=None, 
         logger.error(f"TTS não encontrado: {tts_path}")
         return False
 
-    if not os.path.exists(srt_path):
-        logger.error(f"SRT não encontrado: {srt_path}")
-        return False
+    # SRT ausente ou vazio não impede o vídeo — renderiza sem legendas
+    if not os.path.exists(srt_path) or os.path.getsize(srt_path) == 0:
+        logger.warning(f"SRT ausente ou vazio ({srt_path}) — renderizando sem legendas.")
+        srt_path = None
 
     has_music = bool(music_path and os.path.exists(music_path))
     n_images = len(image_paths)
@@ -294,22 +300,28 @@ def render_from_clips(clip_paths, tts_path, srt_path, output_path, music_path=No
         return False
 
     # Passo 2: escalar para 1080x1920, adicionar áudio + legendas
-    srt_escaped    = _escape_srt_path(srt_path)
-    subtitle_style = (
-        "FontName=Arial,FontSize=20,Bold=1,"
-        "PrimaryColour=&H00FFFFFF,"
-        "OutlineColour=&H00000000,"
-        "Outline=2,Shadow=1,"
-        "Alignment=2,MarginV=30"
-    )
+    # SRT ausente ou vazio não impede o vídeo — renderiza sem legendas
+    if not os.path.exists(srt_path) or os.path.getsize(srt_path) == 0:
+        logger.warning(f"SRT ausente ou vazio ({srt_path}) — renderizando sem legendas.")
+        subtitle_filter = ""
+    else:
+        srt_escaped    = _escape_srt_path(srt_path)
+        subtitle_style = (
+            "FontName=Arial,FontSize=20,Bold=1,"
+            "PrimaryColour=&H00FFFFFF,"
+            "OutlineColour=&H00000000,"
+            "Outline=2,Shadow=1,"
+            "Alignment=2,MarginV=30"
+        )
+        subtitle_filter = f",subtitles='{srt_escaped}':force_style='{subtitle_style}'"
     has_music = bool(music_path and os.path.exists(music_path))
 
     if has_music:
         filter_complex = (
             f"[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
             f"eq=saturation=1.5:contrast=1.1:brightness=0.02,unsharp=5:5:0.5:3:3:0.0,"
-            f"vignette=angle=0.8,"
-            f"subtitles='{srt_escaped}':force_style='{subtitle_style}'[vfinal];"
+            f"vignette=angle=0.8"
+            f"{subtitle_filter}[vfinal];"
             f"[1:a]volume=1.0[tts];"
             f"[2:a]volume=0.12,atrim=0:{total_duration}[bg];"
             f"[tts][bg]amix=inputs=2:duration=first[aout]"
@@ -324,8 +336,8 @@ def render_from_clips(clip_paths, tts_path, srt_path, output_path, music_path=No
         filter_complex = (
             f"[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
             f"eq=saturation=1.5:contrast=1.1:brightness=0.02,unsharp=5:5:0.5:3:3:0.0,"
-            f"vignette=angle=0.8,"
-            f"subtitles='{srt_escaped}':force_style='{subtitle_style}'[vfinal]"
+            f"vignette=angle=0.8"
+            f"{subtitle_filter}[vfinal]"
         )
         cmd = [
             _ffmpeg_exe(), "-y",

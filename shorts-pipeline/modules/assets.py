@@ -1,5 +1,6 @@
 import asyncio
 import os
+import time
 import logging
 import requests
 
@@ -61,6 +62,34 @@ def _words_to_srt(words, words_per_block=5):
     return "\n".join(lines)
 
 
+def _estimate_srt_from_text(text, words_per_block=5, words_per_second=2.6):
+    """
+    Fallback: gera SRT com tempos estimados quando o Edge-TTS não retorna
+    eventos WordBoundary (falha intermitente conhecida). Estima ~2.6
+    palavras/segundo para voz pt-BR. Legenda levemente fora de sincronia
+    é melhor do que perder o vídeo inteiro.
+    """
+    tokens = [w for w in text.split() if w.strip()]
+    if not tokens:
+        return ""
+    entries = []
+    t = 0.0
+    i = 0
+    while i < len(tokens):
+        block = tokens[i:i + words_per_block]
+        dur = len(block) / words_per_second
+        entries.append((t, t + dur, " ".join(block)))
+        t += dur
+        i += words_per_block
+    lines = []
+    for idx, (start, end, block_text) in enumerate(entries, 1):
+        lines.append(str(idx))
+        lines.append(f"{_fmt_srt_time(start)} --> {_fmt_srt_time(end)}")
+        lines.append(block_text)
+        lines.append("")
+    return "\n".join(lines)
+
+
 def generate_tts_with_srt(text, audio_path, srt_path, voice="pt-BR-FranciscaNeural", rate="+10%", words_per_block=5):
     """
     Gera narração TTS e SRT sincronizado via eventos WordBoundary do Edge-TTS.
@@ -87,8 +116,26 @@ def generate_tts_with_srt(text, audio_path, srt_path, voice="pt-BR-FranciscaNeur
                     f.write(data)
             return words
 
-        words = asyncio.run(_run())
-        srt_content = _words_to_srt(words, words_per_block)
+        # Retry: o Edge-TTS às vezes não emite WordBoundary (SRT sairia vazio)
+        words = []
+        for attempt in range(3):
+            if attempt:
+                logger.warning(f"Edge-TTS sem WordBoundary — nova tentativa {attempt + 1}/3...")
+                time.sleep(2 * attempt)
+            words = asyncio.run(_run())
+            if words and os.path.exists(audio_path) and os.path.getsize(audio_path) > 1000:
+                break
+
+        if not os.path.exists(audio_path) or os.path.getsize(audio_path) <= 1000:
+            logger.error("Edge-TTS não gerou áudio válido após 3 tentativas.")
+            return False
+
+        if words:
+            srt_content = _words_to_srt(words, words_per_block)
+        else:
+            logger.warning("WordBoundary indisponível — usando SRT com tempos estimados (fallback).")
+            srt_content = _estimate_srt_from_text(text, words_per_block)
+
         with open(srt_path, "w", encoding="utf-8") as f:
             f.write(srt_content)
         logger.info(f"TTS gerado: {audio_path} | SRT: {srt_path} ({len(words)} palavras)")

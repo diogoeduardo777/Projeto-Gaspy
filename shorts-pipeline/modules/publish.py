@@ -1,8 +1,37 @@
 import os
 import urllib.parse
 import logging
+import requests
 
 logger = logging.getLogger(__name__)
+
+_BROWSER_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+)
+
+
+def check_link_alive(url, timeout=10):
+    """
+    Verifica se o link do produto ainda existe antes de publicar.
+    Só considera morto em 404/410 explícito — bloqueio anti-bot (403/503)
+    e erro de rede contam como vivo para não descartar link bom por engano.
+    """
+    if not url:
+        return False
+    try:
+        resp = requests.head(url, timeout=timeout, allow_redirects=True,
+                             headers={"User-Agent": _BROWSER_UA})
+        if resp.status_code in (404, 410):
+            return False
+        if resp.status_code == 405:  # HEAD não permitido — tenta GET leve
+            resp = requests.get(url, timeout=timeout, allow_redirects=True,
+                                headers={"User-Agent": _BROWSER_UA}, stream=True)
+            resp.close()
+            return resp.status_code not in (404, 410)
+        return True
+    except requests.RequestException:
+        return True  # não deu para verificar — mantém o link
 
 _AMAZON_SEARCH_URL = "https://www.amazon.com.br/s"
 _SHOPEE_SEARCH_URL = "https://shopee.com.br/search"
@@ -132,6 +161,14 @@ def save_publish_assets(job_dir, topic_title, slug, script_short, amazon_link, s
                         top_keywords, telegram_channel="", mercadolivre_link=None, platform=None):
     """Salva description.txt e links de afiliado no diretório do job."""
     os.makedirs(job_dir, exist_ok=True)
+
+    # Health-check: link direto de produto morto (404) vira link de busca atualizado
+    if amazon_link and "/dp/" in amazon_link and not check_link_alive(amazon_link):
+        logger.warning(f"Link Amazon morto — substituindo por busca: {amazon_link}")
+        amazon_link = generate_amazon_link(top_keywords, os.getenv("AMAZON_AFFILIATE_TAG", ""))
+    if shopee_link and "-i." in shopee_link and not check_link_alive(shopee_link):
+        logger.warning(f"Link Shopee morto — substituindo por busca: {shopee_link}")
+        shopee_link = generate_shopee_link(top_keywords, os.getenv("SHOPEE_AFFILIATE_ID", ""))
 
     description = generate_description(
         topic_title, script_short, amazon_link, shopee_link, top_keywords,
