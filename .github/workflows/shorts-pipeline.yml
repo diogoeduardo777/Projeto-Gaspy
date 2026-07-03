@@ -2,7 +2,7 @@ name: Shorts Pipeline - Gerar e Subir Vídeos
 
 on:
   schedule:
-    - cron: '0 21 * * *'   # 18h BRT (UTC-3) — publica no horário de pico do YouTube Brasil
+    - cron: '0 10 * * *'   # 7h BRT (UTC-3) — gera de manhã e agenda os vídeos para 12h/15h/18h/21h BRT
   workflow_dispatch:         # permite disparo manual pelo GitHub UI
 
 jobs:
@@ -59,7 +59,9 @@ jobs:
           ACTIVE_NICHE:        ${{ secrets.ACTIVE_NICHE }}
           VIDEO_ENCODER:       cpu
           YOUTUBE_AUTO_UPLOAD:      ${{ secrets.YOUTUBE_AUTO_UPLOAD }}
-          YOUTUBE_PRIVACY:          ${{ secrets.YOUTUBE_PRIVACY }}
+          # scheduled: cada vídeo é agendado para o próximo horário de pico (BRT)
+          YOUTUBE_PRIVACY:          scheduled
+          YOUTUBE_PUBLISH_HOURS:    "12,15,18,21"
           TELEGRAM_CHANNEL:         ${{ secrets.TELEGRAM_CHANNEL }}
           MERCADOLIVRE_AFFILIATE_ID: ${{ secrets.MERCADOLIVRE_AFFILIATE_ID }}
           PRODUCT_MODE:              "true"

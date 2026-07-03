@@ -18,6 +18,13 @@ YOUTUBE_CREDENTIALS_FILE = os.getenv("YOUTUBE_CREDENTIALS_FILE", "client_secrets
 YOUTUBE_TOKEN_FILE       = os.getenv("YOUTUBE_TOKEN_FILE", "token.json")
 YOUTUBE_PRIVACY          = os.getenv("YOUTUBE_PRIVACY", "private")
 
+# Horários (BRT) de publicação escalonada quando YOUTUBE_PRIVACY=scheduled.
+# Cada vídeo do dia é agendado para o próximo horário da lista (pico de audiência).
+YOUTUBE_PUBLISH_HOURS = [
+    int(h.strip()) for h in os.getenv("YOUTUBE_PUBLISH_HOURS", "12,15,18,21").split(",")
+    if h.strip().isdigit() and 0 <= int(h.strip()) <= 23
+]
+
 # Unsplash (imagens royalty-free)
 UNSPLASH_ACCESS_KEY = os.getenv("UNSPLASH_ACCESS_KEY", "")
 

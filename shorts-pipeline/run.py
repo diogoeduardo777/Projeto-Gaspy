@@ -35,6 +35,20 @@ def _ensure_dirs():
     os.makedirs(config.JOBS_DIR, exist_ok=True)
 
 
+# Rotação dos horários de pico: cada vídeo do dia sai em um horário diferente
+_publish_slot = 0
+
+
+def _next_publish_hour():
+    global _publish_slot
+    hours = config.YOUTUBE_PUBLISH_HOURS
+    if not hours or config.YOUTUBE_PRIVACY != "scheduled":
+        return None
+    hour = hours[_publish_slot % len(hours)]
+    _publish_slot += 1
+    return hour
+
+
 def _save_json(path, data):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
@@ -144,6 +158,7 @@ def process_topic(topic, tracker):
             video_path=output_path, title=yt_title, description=description_text,
             tags=topic["top_keywords"] + extra_tags, credentials_file=config.YOUTUBE_CREDENTIALS_FILE,
             token_file=config.YOUTUBE_TOKEN_FILE, privacy=config.YOUTUBE_PRIVACY,
+            publish_hour=_next_publish_hour(),
         )
 
         if youtube_id:
@@ -336,6 +351,7 @@ def process_product(product, style, tracker):
             video_path=output_path, title=yt_title, description=description_text,
             tags=top_keywords + extra_tags, credentials_file=config.YOUTUBE_CREDENTIALS_FILE,
             token_file=config.YOUTUBE_TOKEN_FILE, privacy=config.YOUTUBE_PRIVACY,
+            publish_hour=_next_publish_hour(),
         )
         if youtube_id:
             youtube_url = f"https://youtube.com/shorts/{youtube_id}"

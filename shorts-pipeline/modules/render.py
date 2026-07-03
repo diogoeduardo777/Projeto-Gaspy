@@ -5,7 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-FPS = 25
+FPS = 30  # padrão YouTube Shorts
 _encoder_cache = None
 _FFMPEG_FALLBACK = r"C:\ffmpeg\bin\ffmpeg.exe"
 
@@ -152,12 +152,13 @@ def _build_filter_complex(image_paths, srt_path, total_duration, has_music, n_ex
     # srt_path=None → renderiza sem legendas (SRT ausente/vazio não derruba o vídeo)
     if srt_path:
         srt_escaped = _escape_srt_path(srt_path)
+        # FontSize 24 + MarginV 60: legenda maior e acima da área de botões do Shorts
         subtitle_style = (
-            "FontName=Arial,FontSize=20,Bold=1,"
+            "FontName=Arial,FontSize=24,Bold=1,"
             "PrimaryColour=&H00FFFFFF,"
             "OutlineColour=&H00000000,"
             "Outline=2,Shadow=1,"
-            "Alignment=2,MarginV=30"
+            "Alignment=2,MarginV=60"
         )
         subtitle_filter = f"subtitles='{srt_escaped}':force_style='{subtitle_style}',"
     else:
@@ -170,18 +171,19 @@ def _build_filter_complex(image_paths, srt_path, total_duration, has_music, n_ex
         f"vignette=angle=0.8[vfinal]"
     )
 
-    # Áudio
+    # Áudio — loudnorm -14 LUFS (padrão YouTube) para volume consistente entre vídeos
     tts_idx = n  # índice do input TTS no comando FFmpeg
     if has_music:
         music_idx = n + 1
         parts.append(
             f"[{tts_idx}:a]volume=1.0[tts];"
             f"[{music_idx}:a]volume=0.12,atrim=0:{total_duration}[bg];"
-            f"[tts][bg]amix=inputs=2:duration=first[aout]"
+            f"[tts][bg]amix=inputs=2:duration=first,"
+            f"loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
         )
-        audio_map = "[aout]"
     else:
-        audio_map = f"{tts_idx}:a"
+        parts.append(f"[{tts_idx}:a]loudnorm=I=-14:TP=-1.5:LRA=11[aout]")
+    audio_map = "[aout]"
 
     return ";".join(parts), audio_map
 
@@ -306,12 +308,13 @@ def render_from_clips(clip_paths, tts_path, srt_path, output_path, music_path=No
         subtitle_filter = ""
     else:
         srt_escaped    = _escape_srt_path(srt_path)
+        # FontSize 24 + MarginV 60: legenda maior e acima da área de botões do Shorts
         subtitle_style = (
-            "FontName=Arial,FontSize=20,Bold=1,"
+            "FontName=Arial,FontSize=24,Bold=1,"
             "PrimaryColour=&H00FFFFFF,"
             "OutlineColour=&H00000000,"
             "Outline=2,Shadow=1,"
-            "Alignment=2,MarginV=30"
+            "Alignment=2,MarginV=60"
         )
         subtitle_filter = f",subtitles='{srt_escaped}':force_style='{subtitle_style}'"
     has_music = bool(music_path and os.path.exists(music_path))
@@ -324,7 +327,8 @@ def render_from_clips(clip_paths, tts_path, srt_path, output_path, music_path=No
             f"{subtitle_filter}[vfinal];"
             f"[1:a]volume=1.0[tts];"
             f"[2:a]volume=0.12,atrim=0:{total_duration}[bg];"
-            f"[tts][bg]amix=inputs=2:duration=first[aout]"
+            f"[tts][bg]amix=inputs=2:duration=first,"
+            f"loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
         )
         cmd = [
             _ffmpeg_exe(), "-y",
@@ -337,13 +341,14 @@ def render_from_clips(clip_paths, tts_path, srt_path, output_path, music_path=No
             f"[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
             f"eq=saturation=1.5:contrast=1.1:brightness=0.02,unsharp=5:5:0.5:3:3:0.0,"
             f"vignette=angle=0.8"
-            f"{subtitle_filter}[vfinal]"
+            f"{subtitle_filter}[vfinal];"
+            f"[1:a]loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
         )
         cmd = [
             _ffmpeg_exe(), "-y",
             "-i", concat_path, "-i", tts_path,
             "-filter_complex", filter_complex,
-            "-map", "[vfinal]", "-map", "1:a",
+            "-map", "[vfinal]", "-map", "[aout]",
         ]
 
     encoder = _detect_best_encoder()

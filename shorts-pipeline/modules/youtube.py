@@ -12,18 +12,23 @@ _SCOPES = [
 _CATEGORY_TECH = "28"
 
 
-def _compute_publish_at_18h_brt():
+def _compute_publish_at_brt(hour=18):
     """
-    Calcula o timestamp para publicação às 18h BRT (21h UTC) do dia atual.
-    Se já passou das 18h BRT, agenda para o dia seguinte.
+    Calcula o timestamp para publicação na hora indicada (BRT) do dia atual.
+    Se o horário já passou, agenda para o dia seguinte.
     """
     brt = timezone(timedelta(hours=-3))
     now_brt = datetime.now(timezone.utc).astimezone(brt)
-    target = now_brt.replace(hour=18, minute=0, second=0, microsecond=0)
+    target = now_brt.replace(hour=hour, minute=0, second=0, microsecond=0)
     if now_brt >= target:
         target += timedelta(days=1)
     utc_target = target.astimezone(timezone.utc)
     return utc_target.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+# Compatibilidade retroativa com o nome antigo
+def _compute_publish_at_18h_brt():
+    return _compute_publish_at_brt(18)
 
 
 def _get_credentials(credentials_file, token_file):
@@ -50,6 +55,18 @@ def _get_credentials(credentials_file, token_file):
                 creds = None
 
         if not creds:
+            # Em execução automática (Agendador de Tarefas, sem console) não há
+            # como autorizar no navegador — falha com instrução clara em vez de travar
+            import sys
+            headless = os.getenv("YOUTUBE_HEADLESS", "").lower() == "true" or not sys.stdin.isatty()
+            if headless:
+                logger.error(
+                    "Token do YouTube expirado e execução sem console — upload pulado. "
+                    "Rode manualmente 'python run.py' uma vez no PC para renovar a autorização "
+                    "(abre o navegador). Os vídeos ficam salvos em data/jobs para upload depois."
+                )
+                raise RuntimeError("YouTube: token expirado em modo automático (re-autorização manual necessária)")
+
             # Abre o navegador para autorização (só acontece uma vez)
             flow = InstalledAppFlow.from_client_secrets_file(credentials_file, _SCOPES)
 
@@ -79,10 +96,11 @@ def _build_client(credentials_file, token_file):
 
 
 def upload_video(video_path, title, description, tags, credentials_file,
-                 token_file="token.json", privacy="private"):
+                 token_file="token.json", privacy="private", publish_hour=None):
     """
     Faz upload do vídeo para o YouTube via Data API v3.
     Primeira execução: abre o navegador para autorizar (uma vez só).
+    privacy="scheduled": agenda a publicação para publish_hour (BRT, default 18h).
     Retorna video_id ou None em caso de falha.
     """
     if not os.path.exists(credentials_file):
@@ -104,11 +122,12 @@ def upload_video(video_path, title, description, tags, credentials_file,
         ai_disclaimer = "\n\n---\n⚠️ Este vídeo foi criado com auxílio de inteligência artificial."
         full_description = description + ai_disclaimer
 
-        # "scheduled" → agenda publicação automática para 18h BRT do dia corrente
+        # "scheduled" → agenda publicação automática (publish_hour BRT, default 18h)
         if privacy == "scheduled":
-            publish_at = _compute_publish_at_18h_brt()
+            hour = publish_hour if publish_hour is not None else 18
+            publish_at = _compute_publish_at_brt(hour)
             effective_privacy = "private"
-            logger.info(f"Publicação agendada para 18h BRT: {publish_at}")
+            logger.info(f"Publicação agendada para {hour}h BRT: {publish_at}")
         else:
             publish_at = None
             effective_privacy = privacy

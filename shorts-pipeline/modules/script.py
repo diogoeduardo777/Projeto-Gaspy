@@ -55,8 +55,9 @@ ESTRUTURA OBRIGATÓRIA:
    - "Testei 7 produtos assim. Só esse sobreviveu."
 2. BENEFÍCIOS COM PROVA (3–20s): 3 frases diretas com comparações e reações reais. Sem especificações inventadas.
    Use: "comparado com o anterior", "minha namorada/amigo/colega falou", "no dia a dia faz diferença".
-3. CTA URGENTE (20–30s): Urgência real + prova social + "link na descrição".
-   Ex: "Todo mundo que comprou voltou pra me agradecer. Link na descrição antes de acabar o estoque."
+3. CTA URGENTE (20–30s): Urgência real + prova social + "link na descrição" + TERMINE com uma
+   pergunta direta que gere comentários (comentários impulsionam o vídeo no algoritmo).
+   Ex: "Todo mundo que comprou voltou pra me agradecer. Link na descrição antes de acabar o estoque. E comenta aí: você usaria?"
 
 LINGUAGEM: gírias BR naturais ("cara", "mano", "galera", "pra caramba", "demais", "véi", "olha só").
 Fale como quem testou de verdade, NÃO como vendedor. Varie frases curtas e longas.
@@ -103,12 +104,13 @@ Descrição do produto: {description}
 ESTILO: VIRAL EXPLOSIVO — gancho que choca, números reais que impressionam, CTA urgente.
 
 ESTRUTURA:
-1. GANCHO (0–3s): Use os dados reais para chocar. Ex:
+1. GANCHO (0–3s): OBRIGATÓRIO citar o preço real (R$ {price}) OU o número de vendas ({sold}) nos 3 primeiros segundos. Ex:
    - "Esse produto tem {sold} vendas na Shopee e eu nunca tinha ouvido falar"
    - "R$ {price} por isso? Fiquei em choque quando recebi"
-   - "Todo mundo tá comprando e ninguém tá falando"
+   - "Custa R$ {price} e todo mundo tá comprando sem ninguém falar"
 2. BENEFÍCIOS (3–20s): 3 benefícios reais e verificáveis, baseados na descrição. Sem inventar specs.
-3. CTA (20–30s): Urgência + prova social + "link na descrição".
+3. CTA (20–30s): Urgência + prova social + "link na descrição" + TERMINE com uma pergunta direta
+   que gere comentários. Ex: "Comenta aí: você usaria ou acha caro demais?", "Me conta nos comentários se você já tem um desses".
 
 LINGUAGEM: gírias BR naturais, tom de quem testou de verdade, NÃO de vendedor.
 
@@ -152,9 +154,10 @@ ESTILO: UGC AUTÊNTICO — pessoa real, linguagem casual, mostrando o produto no
 NÃO parece propaganda. Parece recomendação de amigo.
 
 ESTRUTURA:
-1. ABERTURA CASUAL (0–5s): "Olha o que chegou pra mim..." ou "Precisava te mostrar isso"
+1. ABERTURA CASUAL (0–5s): "Olha o que chegou pra mim..." ou "Precisava te mostrar isso" — mencione o preço (R$ {price}) logo no começo
 2. DEMONSTRAÇÃO (5–20s): Usando/testando o produto, reação genuína, mostra resultado real
-3. RECOMENDAÇÃO (20–30s): "Valeu muito o preço, link na descrição"
+3. RECOMENDAÇÃO (20–30s): "Valeu muito o preço, link na descrição" + TERMINE com uma pergunta
+   que gere comentários. Ex: "Comenta aí se você compraria", "Qual desses você usa? Me conta nos comentários"
 
 LINGUAGEM: casual, gírias BR, tom de conversa, como TikTok de pessoa comum.
 Mencione o preço real (R$ {price}) — preço acessível é prova social forte.
