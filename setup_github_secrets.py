@@ -28,6 +28,9 @@ ENV_FILE    = BASE_DIR / ".env"
 SECRETS_JSON = BASE_DIR / "client_secrets.json"
 TOKEN_JSON   = BASE_DIR / "token.json"
 
+# .env do bot do Telegram — fonte dos secrets TELEGRAM_BOT_TOKEN / TELEGRAM_CHANNEL_ID
+BOT_ENV_FILE = Path(__file__).parent / "telegram-bot" / ".env"
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def read_env(path):
@@ -103,8 +106,9 @@ def main():
     key_id, public_key = get_repo_public_key(session, REPO_FULL)
     print(f"Chave pública obtida (key_id: {key_id})\n")
 
-    # Lê valores do .env
+    # Lê valores do .env do pipeline e do bot do Telegram
     env = read_env(ENV_FILE)
+    bot_env = read_env(BOT_ENV_FILE) if BOT_ENV_FILE.exists() else {}
 
     # Base64 das credenciais YouTube
     yt_client_b64 = base64.b64encode(SECRETS_JSON.read_bytes()).decode() if SECRETS_JSON.exists() else ""
@@ -137,6 +141,10 @@ def main():
         # Pipeline
         "ACTIVE_NICHE":      env.get("ACTIVE_NICHE", "tech"),
         "TELEGRAM_CHANNEL":  env.get("TELEGRAM_CHANNEL", ""),
+
+        # Bot do Telegram (lidos do telegram-bot/.env)
+        "TELEGRAM_BOT_TOKEN":  bot_env.get("TELEGRAM_BOT_TOKEN", ""),
+        "TELEGRAM_CHANNEL_ID": bot_env.get("TELEGRAM_CHANNEL_ID", ""),
     }
 
     # Remove secrets vazios (não sobrescreve com vazio)
